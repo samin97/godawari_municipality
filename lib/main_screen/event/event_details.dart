@@ -20,7 +20,7 @@ class _EventDetailsState extends State<EventDetails> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Event Details',
+            'इभेन्टको विवरण',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,

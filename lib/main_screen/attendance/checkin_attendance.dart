@@ -5,9 +5,11 @@ import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
+import 'package:municpality_app/main_screen/settings/update_device_id.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:sms_autofill/sms_autofill.dart';
 import '../../global/components/location_api.dart';
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
@@ -16,7 +18,9 @@ import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
 import '../../models/location_permission_model.dart';
+import '../../models/offline_attendance_model.dart';
 import '../home_screen.dart';
+import 'local_storage/offline_attendance_db.dart';
 
 class AttendanceCheckIn extends StatefulWidget {
   const AttendanceCheckIn({Key? key}) : super(key: key);
@@ -27,6 +31,9 @@ class AttendanceCheckIn extends StatefulWidget {
 
 class _AttendanceCheckInState extends State<AttendanceCheckIn> {
   Position? position;
+  late List<OfflineAttendance> offlineAttendance;
+  bool isLoading = false;
+  TextEditingController phoneNumberController = TextEditingController();
   late AttendanceModel attendanceModel = AttendanceModel(
       nepaliDate: "nepaliDate",
       englishDate: "englishDate",
@@ -36,33 +43,94 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
       deviceId: "deviceId",
       networkId: "networkId",
       altitude: "attitude",
-      status: "status");
+      status: "status",
+      mobileNo: 'mobileNo');
 
   DateTime timeNow = DateTime.now();
   final DateFormat timeFormat = DateFormat('HH:mm:ss');
   var deviceInfo;
   bool hasAttended = false;
-  String currentTime="HH:mm:ss";
+  String currentTime = "HH:mm:ss";
 
   @override
   void initState() {
     super.initState();
     lastAttendance();
     attendanceDetails();
+    refreshOfflineAttendances();
+  }
+  @override
+  void dispose() {
+    OfflineDB.instance.close();
+    super.dispose();
+  }
+
+  Future refreshOfflineAttendances() async {
+    setState(() {
+      isLoading = true;
+    });
+    this.offlineAttendance = await OfflineDB.instance.readAllAttendance();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  Future updateOfflineAttendance() async {
+    final token = sharedPreferences!.getString("token")!;
+    for (int i = 0; i < offlineAttendance.length; i++) {
+      AttendanceModel attendanceModel = AttendanceModel(
+          nepaliDate: offlineAttendance[i].nepaliDate,
+          englishDate: offlineAttendance[i].englishDate,
+          attendDateTime: offlineAttendance[i].time,
+          latitude: offlineAttendance[i].latitude,
+          longitude: offlineAttendance[i].longitude,
+          deviceId: offlineAttendance[i].deviceID,
+          status: offlineAttendance[i].status,
+          mobileNo: offlineAttendance[i].phone);
+      if (offlineAttendance[i].status == 'check-in') {
+        var response = await http.post(
+            Uri.parse(
+                "http://mis.godawarimun.gov.np/Api/Attendence/AttendUser"),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(attendanceModel));
+        print('offline attendance done');
+        print(response.statusCode);
+        if (response.statusCode == 200) {
+          await OfflineDB.instance.delete(offlineAttendance[i].id as int);
+          print('offline attendance done');
+        }
+      } else {
+        var response = await http.post(
+            Uri.parse("http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave"),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+              'Authorization': 'Bearer $token',
+            },
+            body: jsonEncode(attendanceModel));
+        if (response.statusCode == 200) {
+          await OfflineDB.instance.delete(offlineAttendance[i].id as int);
+        }
+      }
+    }
   }
 
   Future<void> lastAttendance() async {
     final token = sharedPreferences!.getString("token")!;
     final response = await http.get(
-      Uri.parse('http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
+      Uri.parse(
+          'http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
     );
+    print(response.body);
     if (response.statusCode == 200) {
       AttendanceModel _lastAttendance =
-          AttendanceModel.fromJson(jsonDecode(response.body));
+      AttendanceModel.fromJson(jsonDecode(response.body));
       if (_lastAttendance.englishDate ==
           DateFormat('yyyy/MM/dd').format(DateTime.now())) {
         setState(() {
@@ -76,6 +144,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     } else {
       throw Exception('Failed to load attendance');
     }
+    print(hasAttended);
   }
 
   Future<void> attendanceDetails() async {
@@ -118,7 +187,30 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
       attendanceModel.networkId = wifiGateway;
       attendanceModel.altitude = position?.altitude.toString();
       attendanceModel.status = "check-in";
+      attendanceModel.mobileNo = phoneNumberController.text.trim();
     });
+  }
+
+  checkPhoneNumber() {
+    if (phoneNumberController.text.isNotEmpty) {
+      checkConnection();
+    } else {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: const Text("Phone number is not filled."),
+              content: const Text("Please enter your correct phone number."),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Conform"))
+              ],
+            ),
+      );
+    }
   }
 
   Future checkConnection() async {
@@ -130,77 +222,85 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     } else {
       showDialog<String>(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("You are offline."),
-          content:
-              const Text("Please make sure that you have internet connection."),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Conform"))
-          ],
-        ),
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: const Text("तपाईं अफलाइन हुनुहुन्छ।"),
+              content: const Text(
+                  "तपाईको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Conform"))
+              ],
+            ),
       );
       //localStorage();
     }
   }
 
-  checkLocation() {
 
-    LocationModel locationModel = LocationModel();
-    locationModel = fetchLocation() as LocationModel;
+  Future checkLocation() async {
+    if (attendanceModel.deviceId != sharedPreferences!.getString("deviceId")!) {
 
+      return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: Text(
+                  "तपाइको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
+              content: Text("भेरिफाईकोलागि अनुरोध गर्न याँहा Conform गर्नुहोस् ।"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Route newRoute = MaterialPageRoute(builder: (_) => const UpdateDeviceID());
+                      Navigator.pushReplacement(context, newRoute);
+                    },
+                    child: const Text("Conform"))
+              ],
+            ),
+      );
+    };
+    print(position?.latitude);
+    print(position?.longitude);
     double distanceInMeters = Geolocator.distanceBetween(
-        position?.latitude as double,
-        position?.longitude as double,
-        locationModel.latitude as double,
-        locationModel.latitude as double);
-    if (distanceInMeters < locationModel.meters!.toDouble()) {
+      position?.latitude as double,
+      position?.longitude as double,
+      double.parse(sharedPreferences!.getString("latitude")!),
+      double.parse(sharedPreferences!.getString("longitude")!),
+    );
+    print(double.parse(sharedPreferences!.getString("permittedDistance")!));
+
+    print(distanceInMeters);
+    bool dif = distanceInMeters <
+        double.parse(sharedPreferences!.getString("permittedDistance")!);
+    print(dif);
+    if (distanceInMeters <
+        double.parse(sharedPreferences!.getString("permittedDistance")!)) {
+      attendanceDetails();
       postAttendance();
     } else {
       showDialog<String>(
         context: context,
-        builder: (BuildContext context) => AlertDialog(
-          title: const Text("You are too far."),
-          content: const Text(
-              "Please remain with in 20 meter of the office to post attendance"),
-          actions: [
-            TextButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-                child: const Text("Conform"))
-          ],
-        ),
+        builder: (BuildContext context) =>
+            AlertDialog(
+              title: Text(
+                  "तपार्इ कार्यालयबाट लगभग " + distanceInMeters.toStringAsFixed(2) +
+                      " मिटर टाढा हुनुहुन्छ."),
+              content: Text("तपार्इ कार्यालयबाट " +
+                  sharedPreferences!.getString("permittedDistance")! +
+                  "म िटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Conform"))
+              ],
+            ),
       );
     }
-  }
-
-  Future localStorage() async {
-    if (sharedPreferences!.getString("logID") == null) {
-      await sharedPreferences?.setString("logID", '1000');
-    }
-    var logID = sharedPreferences!.getString("logID");
-    Log log = Log(
-      id: logID,
-      attendDateTime: attendanceModel.attendDateTime,
-      nepaliDate: attendanceModel.nepaliDate,
-      longitude: attendanceModel.longitude,
-      latitude: attendanceModel.latitude,
-      deviceId: attendanceModel.deviceId,
-      englishDate: attendanceModel.englishDate,
-      networkId: attendanceModel.networkId,
-      altitude: attendanceModel.altitude,
-      status: attendanceModel.status,
-    );
-
-    logID = (int.parse(logID!) + 1).toString();
-    await sharedPreferences?.setString("logID", logID);
-    setState(() {});
-    SqliteMethods().init();
-    LogRepository.addLogs(log);
   }
 
   Future postAttendance() async {
@@ -214,19 +314,24 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
         body: jsonEncode(attendanceModel));
 
     if (response.statusCode == 200) {
+      refreshOfflineAttendances();
+      updateOfflineAttendance();
       // var s = response.body.toString();
       Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
       Navigator.pushReplacement(context, newRoute);
     } else {
+      print(response.body);
       showDialog(
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "Failed to attend",
+              message: "हाजिर गर्न असमर्थन हुनुभयो । पुनःप्रयास गर्नुहोला ।",
             );
           });
     }
   }
+
+  final double textSize = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -238,7 +343,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
             Visibility(
                 visible: hasAttended,
                 child: const Center(
-                  child: Text("You have already check in"),
+                  child: Text("तपाईको आजको उपस्थिति पेश गरिसक्नुभएको छ ।"),
                 )),
             Visibility(
               visible: !hasAttended,
@@ -246,87 +351,164 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
                 children: [
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Nepali Date")),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.nepaliDate!)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("English Date")),
+                          flex: 1,
+                          child: Text(
+                            "Nepali Date",
+                            style: TextStyle(fontSize: textSize),
+                          )),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.englishDate!)),
+                          flex: 1,
+                          child: Text(
+                            attendanceModel.nepaliDate!,
+                            style: TextStyle(fontSize: textSize),
+                          )),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Attend Time")),
                       Expanded(
-                          flex: 1, child: Text(currentTime)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Latitude")),
-                      Expanded(flex: 1, child: Text(attendanceModel.latitude!)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Longitude")),
+                          flex: 1,
+                          child: Text("English Date",
+                              style: TextStyle(fontSize: textSize))),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.longitude!)),
+                          flex: 1,
+                          child: Text(attendanceModel.englishDate!,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Device Id")),
-                      Expanded(flex: 1, child: Text(attendanceModel.deviceId)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Network Id")),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.networkId!)),
+                          flex: 1,
+                          child: Text("Attend Time",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(currentTime,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Attitude")),
-                      Expanded(flex: 1, child: Text(attendanceModel.altitude!)),
+                      Expanded(
+                          flex: 1,
+                          child: Text("Latitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.latitude!,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Status")),
-                      Expanded(flex: 1, child: Text(attendanceModel.status!)),
+                      Expanded(
+                          flex: 1,
+                          child: Text("Longitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.longitude!,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                        attendanceDetails();
-                      },
-                      child: const Text("Set Attendance Details")),
-                  ElevatedButton(
-                      onPressed: () {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text("Are you sure?"),
-                            content: const Text(
-                                "You can only do this once per day."),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    checkConnection();
-                                  },
-                                  child: const Text("Conform"))
-                            ],
-                          ),
-                        );
-                      },
-                      child: const Text("Post Attendance")),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Device Id",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.deviceId,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Network Id",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.networkId!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Attitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.altitude!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Status",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.status!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //         flex: 1,
+                  //         child: Text("Phone Number",
+                  //             style: TextStyle(fontSize: textSize))),
+                  //     Expanded(
+                  //       flex: 1,
+                  //       child: PhoneFieldHint(
+                  //         controller: phoneNumberController,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // ElevatedButton(
+                      //     onPressed: () {
+                      //       attendanceDetails();
+                      //     },
+                      //     child: const Text("Update Information")),
+                      ElevatedButton(
+                          onPressed: () {
+                            showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) =>
+                                  AlertDialog(
+                                    title: const Text("के तपाईं पक्का हुनुहुन्छ ?"),
+                                    content: const Text(
+                                        "हाजिरि गर्दाखेरीः  दिनमा एकपटकमात्र तपाई आफ्नो हाजिरी गर्न सक्नुहुन्छ ।"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            checkConnection();
+                                          },
+                                          child: const Text("Conform"))
+                                    ],
+                                  ),
+                            );
+                          },
+                          child: const Text("हाजिर गर्नुहोस्")),
+                    ],
+                  ),
                 ],
               ),
             )

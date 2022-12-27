@@ -26,11 +26,11 @@ class _AllLeaveState extends State<AllLeave> {
     if (response.statusCode == 200) {
       List<dynamic> parsed =
           json.decode(response.body).cast<Map<String, dynamic>>();
-      print(parsed);
+      //print(parsed);
       List<LeaveModel> list = [];
-      print(list);
+      //print(list);
       list = parsed.map((json) => LeaveModel.fromJson(json)).toList();
-      print(list);
+      //print(list);
       return list;
     } else {
       throw Exception('Failed to load leave log');
@@ -62,6 +62,7 @@ class _AllLeaveState extends State<AllLeave> {
                     child: InkWell(
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,10 +73,15 @@ class _AllLeaveState extends State<AllLeave> {
                                   leaveList[index].leaveFor.toString())
                             ],
                           ),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Text("Date: " +
-                                  leaveList[index].leaveDate.toString()))
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Start Date: " +
+                                  leaveList[index].leaveDate.toString()),
+                              Text("End Date: " +
+                                  leaveList[index].leaveTo.toString()),
+                            ],
+                          )
                         ],
                       ),
                       onTap: () {

@@ -12,8 +12,8 @@ class AttendanceModel {
     required this.latitude,
     required this.longitude,
     required this.deviceId,
-    required this.networkId,
-    required this.altitude,
+    this.networkId,
+    this.altitude,
     required this.status,
     required this.mobileNo,
   });

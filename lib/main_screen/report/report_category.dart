@@ -14,67 +14,73 @@ class ReportCategory extends StatefulWidget {
 
 class _ReportCategoryState extends State<ReportCategory> {
   @override
+  Future<bool> _onWillPop() async{
+    return false;
+  }
   Widget build(BuildContext context) {
-    return DefaultTabController(
-        length: 2,
-        child: Scaffold(
-          appBar: AppBar(
-            automaticallyImplyLeading: false,
-            title: const Text(
-              'Report',
-              style: TextStyle(
-                fontSize: 30,
-                color: Colors.white,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: DefaultTabController(
+          length: 2,
+          child: Scaffold(
+            appBar: AppBar(
+              automaticallyImplyLeading: false,
+              title: const Text(
+                'हाजिरीको प्रतिवेदन',
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.white,
+                ),
+              ),
+              centerTitle: true,
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Route newRoute =
+                      MaterialPageRoute(builder: (_) => const HomeScreen());
+                  Navigator.pushReplacement(context, newRoute);
+                },
+              ),
+              bottom: const TabBar(
+                tabs: [
+                  Tab(
+                    icon: Icon(
+                      Icons.calendar_month_outlined,
+                      color: Colors.white,
+                    ),
+                    text: "मासिक विवरण ",
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.calendar_month_outlined,
+                      color: Colors.white,
+                    ),
+                    text: "बार्षिक विवरण",
+                  )
+                ],
+                indicatorColor: Colors.white38,
+                indicatorWeight: 7,
               ),
             ),
-            centerTitle: true,
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Route newRoute =
-                    MaterialPageRoute(builder: (_) => const HomeScreen());
-                Navigator.pushReplacement(context, newRoute);
-              },
-            ),
-            bottom: const TabBar(
-              tabs: [
-                Tab(
-                  icon: Icon(
-                    Icons.calendar_month_outlined,
-                    color: Colors.white,
-                  ),
-                  text: "Monthly",
+            body: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.white70,
+                    Colors.white,
+                  ],
                 ),
-                Tab(
-                  icon: Icon(
-                    Icons.calendar_month_outlined,
-                    color: Colors.white,
-                  ),
-                  text: "Yearly",
-                )
-              ],
-              indicatorColor: Colors.white38,
-              indicatorWeight: 7,
-            ),
-          ),
-          body: Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.white70,
-                  Colors.white,
+              ),
+              child:  const TabBarView(
+                children: [
+                  ReportMonth(),
+                  ReportYear(),
                 ],
               ),
             ),
-            child:  const TabBarView(
-              children: [
-                ReportMonth(),
-                ReportYear(),
-              ],
-            ),
-          ),
-        ));
+          )),
+    );
   }
 }

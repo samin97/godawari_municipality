@@ -24,18 +24,18 @@ class _ReportMonthState extends State<ReportMonth> {
 
   String? value;
   final monthList = [
-    'Baishakh',
-    'Jestha',
-    'Ashadh',
-    'Shrawan',
-    'Bhadau',
-    'Ashwin',
-    'Kartik',
-    'Mangsir',
-    'Poush',
-    'Magh',
-    'Falgun',
-    'Chaitra',
+    'बैशाख',
+    'जेष्ठ',
+    'अषाढ',
+    'श्रावण',
+    'भदौ',
+    'असोज',
+    'कार्तिक',
+    'मंसिर',
+    'पुष',
+    'माघ',
+    'फागुन',
+    'चैत्र',
   ];
 
   DropdownMenuItem<String> buildMenuItems(String monthList) => DropdownMenuItem(
@@ -55,7 +55,7 @@ class _ReportMonthState extends State<ReportMonth> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                  const Text(
-                   'Month: ',
+                   'महिना : ',
                    style: TextStyle(
                      fontSize: 25,
                      fontWeight: FontWeight.bold,
@@ -63,19 +63,21 @@ class _ReportMonthState extends State<ReportMonth> {
                    ),
                  ),
                 const SizedBox(
-                  height: 20,
+                  height: 6,
                 ),
                 Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.black),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton(
+                      isDense: true,
                       value: value,
-                      hint: const Text("Pick"),
+                      hint: const Text("महिना  छान्नुहोस्", style: TextStyle(fontSize: 20),),
                       dropdownColor: Colors.white,
                       isExpanded: true,
                       items: monthList.map(buildMenuItems).toList(),
@@ -99,13 +101,13 @@ class _ReportMonthState extends State<ReportMonth> {
                     builder: (BuildContext context) => AlertDialog(
                       title: const Text("Month not selected"),
                       content: const Text(
-                          "Please pick a month."),
+                          "कृपाय महिना छान्नुहोस् ।"),
                       actions: [
                         TextButton(
                             onPressed: () {
                               Navigator.of(context).pop();
                             },
-                            child: const Text("OK"))
+                            child: const Text("ठीक छ  ।"))
                       ],
                     ),
                   );
@@ -117,7 +119,7 @@ class _ReportMonthState extends State<ReportMonth> {
                           ));
                   Navigator.pushReplacement(context, newRoute);
                 }},
-                child: const Text("Submit"))
+                child: const Text("पेश गर्नुहोस्"))
           ],
         ),
       ),

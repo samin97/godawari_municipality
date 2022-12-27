@@ -67,10 +67,15 @@ class _ApprovedLeaveState extends State<ApprovedLeave> {
                                   leaveList[index].leaveFor.toString())
                             ],
                           ),
-                          Align(
-                              alignment: Alignment.topRight,
-                              child: Text("Date: " +
-                                  leaveList[index].leaveDate.toString()))
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Start Date: " +
+                                  leaveList[index].leaveDate.toString()),
+                              Text("End Date: " +
+                                  leaveList[index].leaveTo.toString()),
+                            ],
+                          )
                         ],
                       ),
                       onTap: () {

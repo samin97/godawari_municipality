@@ -1,23 +1,23 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:municpality_app/main_screen/kaaj/admin/update_kaaj.dart';
+import 'package:municpality_app/models/admin_kaaj_model.dart';
 import '../../../global/global.dart';
 import 'package:http/http.dart' as http;
 import '../../../global/widgets/app_button.dart';
-import '../../../models/admin_leave_model.dart';
 import '../../../models/new_leave_status_model.dart';
-import 'leave_status_screen.dart';
 
-class LeaveStatusDetails extends StatefulWidget {
-  final AdminGetLeaveModel adminGetLeaveModel;
+class UpdateKaajDetails extends StatefulWidget {
+  final AdminGetKaajModel adminGetKaajModel;
 
-  const LeaveStatusDetails({Key? key, required this.adminGetLeaveModel})
+  const UpdateKaajDetails({Key? key, required this.adminGetKaajModel})
       : super(key: key);
 
   @override
-  State<LeaveStatusDetails> createState() => _LeaveStatusDetailsState();
+  State<UpdateKaajDetails> createState() => _UpdateKaajDetailsState();
 }
 
-class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
+class _UpdateKaajDetailsState extends State<UpdateKaajDetails> {
   // ignore: prefer_typing_uninitialized_variables
   var dropdownValue;
 
@@ -41,7 +41,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
 
     NewStatus newStatus = NewStatus(id: 0, status: 'pending');
     setState(() {
-      newStatus.id = widget.adminGetLeaveModel.id;
+      newStatus.id = widget.adminGetKaajModel.id;
       newStatus.status = value!;
     });
 
@@ -57,7 +57,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
     print(response);
     print(json.decode(response.body));
     Route newRoute =
-    MaterialPageRoute(builder: (_) => const LeaveStatus());
+    MaterialPageRoute(builder: (_) => const UpdateKaaj());
     Navigator.pushReplacement(context, newRoute);
   }
 
@@ -66,7 +66,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
     return Scaffold(
         appBar: AppBar(
           title: const Text(
-            'Admin Leave',
+            'Admin Kaaj',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,
@@ -78,7 +78,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Route newRoute =
-                  MaterialPageRoute(builder: (_) => const LeaveStatus());
+              MaterialPageRoute(builder: (_) => const UpdateKaaj());
               Navigator.pushReplacement(context, newRoute);
             },
           ),
@@ -88,45 +88,62 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
             padding: const EdgeInsets.all(12.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "Requested by : " +
-                          widget.adminGetLeaveModel.requestedBy.toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Leave Start Date : " +
-                          widget.adminGetLeaveModel.leaveDate
-                              .toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      "Leave End Date : " +
-                          widget.adminGetLeaveModel.leaveTo
-                              .toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
+                    Flexible(
+                        flex: 3,
+                        child: Text(
+                          "Bhraman Start Date : " +
+                              widget.adminGetKaajModel.bhramanStartDate
+                                  .toString(),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        )),
+                    const Spacer(flex: 3,)
+                  ],
+                ),
 
-                    Text(
-                      "Reason : " +
-                          widget.adminGetLeaveModel.leaveFor.toString(),
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.black,
-                      ),
-                    ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                        flex: 3,
+                        child: Text(
+                          "Bhraman End Date : " +
+                              widget.adminGetKaajModel.bhramanEndDate
+                                  .toString(),
+                          style: const TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                          ),
+                        )),
+                    const Spacer(flex: 3,)
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Place For Visit : " +
+                      widget.adminGetKaajModel.placeForVisit .toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "Peski Rakam : " +
+                      widget.adminGetKaajModel.peskiRakam.toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
                 const Divider(
                   thickness: 3,
                 ),
@@ -139,7 +156,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
                   ),
                 ),
                 Text(
-                  widget.adminGetLeaveModel.description.toString(),
+                  widget.adminGetKaajModel.description.toString(),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -155,7 +172,7 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
                       child: Text(
                         'Status : ',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 25,
                           color: Colors.black,
                         ),
                       ),
@@ -165,19 +182,19 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 2),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(12),
                           border: Border.all(color: Colors.black),
                         ),
                         child: DropdownButtonHideUnderline(
                           child: DropdownButton(
                             value: value,
                             hint: Text(
-                                widget.adminGetLeaveModel.status.toString()),
+                                widget.adminGetKaajModel.status.toString()),
                             dropdownColor: Colors.white,
                             isExpanded: true,
                             items: statusType.map(buildMenuItems).toList(),
                             onChanged: (value) => setState(
-                              () {
+                                  () {
                                 this.value = value as String?;
                               },
                             ),
@@ -198,8 +215,8 @@ class _LeaveStatusDetailsState extends State<LeaveStatusDetails> {
                       flex: 2,
                       child: AppButton(
                         textColour: Colors.black54,
-                        backgroundColor: Colors.grey,
-                        borderColor: Colors.grey,
+                        backgroundColor: const Color(0xFF80DEEA),
+                        borderColor: const Color(0xFF80DEEA),
                         text: 'Conform',
                         onTap: () {
                           statusChange();

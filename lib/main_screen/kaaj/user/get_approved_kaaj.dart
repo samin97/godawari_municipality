@@ -4,28 +4,29 @@ import '../../../global/global.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../models/leave_model.dart';
-import 'leave_details.dart';
 
-class CanceledLeave extends StatefulWidget {
-  const CanceledLeave({Key? key}) : super(key: key);
+class ApprovedKaaj extends StatefulWidget {
+  const ApprovedKaaj({Key? key}) : super(key: key);
 
   @override
-  State<CanceledLeave> createState() => _CanceledLeaveState();
+  State<ApprovedKaaj> createState() => _ApprovedKaajState();
 }
 
-class _CanceledLeaveState extends State<CanceledLeave> {
+class _ApprovedKaajState extends State<ApprovedKaaj> {
   Future<List<LeaveModel>> approvedLeave() async {
     final token = sharedPreferences!.getString("token")!;
     final response = await http.get(
-      Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/GetcanceledLeave'),
+      Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/GetApprovedKaaj'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
       },
     );
+    print("approved kaaj");
+    print(response.statusCode);
     if (response.statusCode == 200) {
       List<dynamic> parsed =
-          json.decode(response.body).cast<Map<String, dynamic>>();
+      json.decode(response.body).cast<Map<String, dynamic>>();
       List<LeaveModel> list = [];
       list = parsed.map((json) => LeaveModel.fromJson(json)).toList();
       return list;
@@ -67,25 +68,19 @@ class _CanceledLeaveState extends State<CanceledLeave> {
                                   leaveList[index].leaveFor.toString())
                             ],
                           ),
-
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text("Start Date: " +
-                                  leaveList[index].leaveDate.toString()),
-                              Text("End Date: " +
-                                  leaveList[index].leaveTo.toString()),
-                            ],
-                          )
+                          Align(
+                              alignment: Alignment.topRight,
+                              child: Text("Date: " +
+                                  leaveList[index].leaveDate.toString()))
                         ],
                       ),
                       onTap: () {
-                        Route newRoute = MaterialPageRoute(
-                            builder: (_) => UserLeaveDetails(
-                                  leaveModel: leaveList[index],
-                                  status: 'Canceled',
-                                ));
-                        Navigator.pushReplacement(context, newRoute);
+                        // Route newRoute = MaterialPageRoute(
+                        //     builder: (_) => UserLeaveDetails(
+                        //       leaveModel: leaveList[index],
+                        //       status: 'Approved',
+                        //     ));
+                        // Navigator.pushReplacement(context, newRoute);
                       },
                     ),
                   ),
@@ -93,7 +88,7 @@ class _CanceledLeaveState extends State<CanceledLeave> {
               });
         } else {
           return const Center(
-            child: Text("There are no rejected leave request"),
+            child: Text("There are no approved leave request"),
           );
         }
       },

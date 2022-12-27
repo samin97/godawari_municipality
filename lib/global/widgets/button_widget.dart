@@ -15,21 +15,25 @@ class ButtonHeaderWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => ElevatedButton(
         style: OutlinedButton.styleFrom(
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(5.0),
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.0),
                 side: const BorderSide(
                   color: Colors.black,
                   width: 1,
                 )),
-          minimumSize: const Size.fromHeight(52),
-          foregroundColor: Colors.white,
-          backgroundColor: Colors.white
-        ),
-        child: FittedBox(
+            minimumSize: const Size.fromHeight(52),
+            foregroundColor: Colors.white,
+            backgroundColor: Colors.white),
+        child: Align(
+          alignment: Alignment.centerLeft,
           child: Text(
             text,
-            style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w300),
+            style: const TextStyle(
+              fontSize: 20,
+              color: Colors.black,
+              fontWeight: FontWeight.w400,
+            ),
           ),
         ),
         onPressed: onClicked,

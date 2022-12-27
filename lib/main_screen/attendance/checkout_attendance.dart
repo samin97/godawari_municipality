@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:http/http.dart' as http;
+import 'package:sms_autofill/sms_autofill.dart';
 import '../../global/components/location_api.dart';
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
@@ -17,6 +18,7 @@ import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
 import '../../models/location_permission_model.dart';
 import '../home_screen.dart';
+import '../settings/update_device_id.dart';
 
 class AttendanceCheckOut extends StatefulWidget {
   const AttendanceCheckOut({Key? key}) : super(key: key);
@@ -27,6 +29,7 @@ class AttendanceCheckOut extends StatefulWidget {
 
 class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
   Position? position;
+  TextEditingController phoneNumberController = TextEditingController();
   late AttendanceModel attendanceModel = AttendanceModel(
       nepaliDate: "nepaliDate",
       englishDate: "englishDate",
@@ -36,10 +39,15 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
       deviceId: "deviceId",
       networkId: "networkId",
       altitude: "attitude",
-      status: "status");
+      status: "status",
+      mobileNo: 'mobileNo');
+
   // ignore: prefer_typing_uninitialized_variables
   var deviceInfo;
   bool hasAttended = false;
+  DateTime timeNow = DateTime.now();
+  final DateFormat timeFormat = DateFormat('HH:mm:ss');
+  String currentTime = "HH:mm:ss";
 
   @override
   void initState() {
@@ -51,7 +59,8 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
   Future<void> lastAttendance() async {
     final token = sharedPreferences!.getString("token")!;
     final response = await http.get(
-      Uri.parse('http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
+      Uri.parse(
+          'http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -92,6 +101,7 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
     final String englishFormatted = formatter.format(now);
     //attendDateTime:
 
+    currentTime = timeFormat.format(timeNow);
     String isoAttendDateTime = now.toIso8601String();
     //latitude, longitude and attitude:
     Position newPosition = await Geolocator.getCurrentPosition(
@@ -120,7 +130,29 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
       attendanceModel.networkId = wifiGateway;
       attendanceModel.altitude = position?.altitude.toString();
       attendanceModel.status = "check-out";
+      attendanceModel.mobileNo = phoneNumberController.text.trim();
     });
+  }
+
+  checkPhoneNumber() {
+    if (phoneNumberController.text.isNotEmpty) {
+      checkConnection();
+    } else {
+      showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text("Phone number is not filled."),
+          content: const Text("Please enter your correct phone number."),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Conform"))
+          ],
+        ),
+      );
+    }
   }
 
   Future checkConnection() async {
@@ -133,9 +165,9 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text("You are offline."),
-          content:
-          const Text("Please make sure that you have internet connection."),
+          title: const Text("तपाईं अफलाइन हुनुहुन्छ ."),
+          content: const Text(
+              "तपाईको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
           actions: [
             TextButton(
                 onPressed: () {
@@ -149,25 +181,54 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
     }
   }
 
-  checkLocation() {
-
-    LocationModel locationModel = LocationModel();
-    locationModel = fetchLocation() as LocationModel;
-
+  Future checkLocation() async {
+    if (attendanceModel.deviceId != sharedPreferences!.getString("deviceId")!) {
+      return showDialog<String>(
+        context: context,
+        builder: (BuildContext context) => AlertDialog(
+          title: Text(
+              "तपाइको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
+          content: Text("भेरिफाईकोलागि अनुरोध गर्न याँहा Click गर्नुहोस् ।"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Route newRoute = MaterialPageRoute(builder: (_) => const UpdateDeviceID());
+                  Navigator.pushReplacement(context, newRoute);
+                },
+                child: const Text("Conform"))
+          ],
+        ),
+      );
+    }
+    ;
+    print(double.parse(sharedPreferences!.getString("latitude")!));
+    print(double.parse(sharedPreferences!.getString("longitude")!));
     double distanceInMeters = Geolocator.distanceBetween(
-        position?.latitude as double,
-        position?.longitude as double,
-        locationModel.latitude as double,
-        locationModel.latitude as double);
-    if (distanceInMeters < locationModel.meters!.toDouble()) {
+      position?.latitude as double,
+      position?.longitude as double,
+      double.parse(sharedPreferences!.getString("latitude")!),
+      double.parse(sharedPreferences!.getString("longitude")!),
+    );
+    print(double.parse(sharedPreferences!.getString("permittedDistance")!));
+
+    print(distanceInMeters);
+    bool dif = distanceInMeters <
+        double.parse(sharedPreferences!.getString("permittedDistance")!);
+    print(dif);
+    if (distanceInMeters <
+        double.parse(sharedPreferences!.getString("permittedDistance")!)) {
+      attendanceDetails();
       postAttendance();
     } else {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text("You are too far."),
-          content: const Text(
-              "Please remain with in 20 meter of the office to post attendance"),
+          title: Text(
+              "तपार्इ कार्यालयबाट लगभग " + distanceInMeters.toStringAsFixed(2) +
+                  " मिटर टाढा हुनुहुन्छ."),
+          content: Text("तपार्इ कार्यालयबाट " +
+              sharedPreferences!.getString("permittedDistance")! +
+              "म िटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
           actions: [
             TextButton(
                 onPressed: () {
@@ -186,17 +247,16 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
     }
     var logID = sharedPreferences!.getString("logID");
     Log log = Log(
-      id: logID,
-      attendDateTime: attendanceModel.attendDateTime,
-      nepaliDate: attendanceModel.nepaliDate,
-      longitude: attendanceModel.longitude,
-      latitude: attendanceModel.latitude,
-      deviceId: attendanceModel.deviceId,
-      englishDate: attendanceModel.englishDate,
-      networkId: attendanceModel.networkId,
-      altitude: attendanceModel.altitude,
-      status: "check-out"
-    );
+        id: logID,
+        attendDateTime: attendanceModel.attendDateTime,
+        nepaliDate: attendanceModel.nepaliDate,
+        longitude: attendanceModel.longitude,
+        latitude: attendanceModel.latitude,
+        deviceId: attendanceModel.deviceId,
+        englishDate: attendanceModel.englishDate,
+        networkId: attendanceModel.networkId,
+        altitude: attendanceModel.altitude,
+        status: "check-out");
 
     logID = (int.parse(logID!) + 1).toString();
     await sharedPreferences?.setString("logID", logID);
@@ -208,7 +268,8 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
   Future postAttendance() async {
     final token = sharedPreferences!.getString("token")!;
     var response = await http.post(
-        Uri.parse("http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave"),
+        Uri.parse(
+            "http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave"),
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
           'Authorization': 'Bearer $token',
@@ -224,11 +285,13 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "Failed to attend",
+              message: "हाजिर गर्न असमर्थन हुनुभयो । पुनःप्रयास गर्नुहोला ।",
             );
           });
     }
   }
+
+  final double textSize = 20;
 
   @override
   Widget build(BuildContext context) {
@@ -240,7 +303,7 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
             Visibility(
                 visible: !hasAttended,
                 child: const Center(
-                  child: Text("Please check in first"),
+                  child: Text("कृपया पहिले उपस्थिति पेश गर्नुहोस् ।"),
                 )),
             Visibility(
               visible: hasAttended,
@@ -248,86 +311,164 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
                 children: [
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Nepali Date")),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.nepaliDate!)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("English Date")),
+                          flex: 1,
+                          child: Text(
+                            "Nepali Date",
+                            style: TextStyle(fontSize: textSize),
+                          )),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.englishDate!)),
+                          flex: 1,
+                          child: Text(
+                            attendanceModel.nepaliDate!,
+                            style: TextStyle(fontSize: textSize),
+                          )),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Attend Date Time")),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.attendDateTime)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Latitude")),
-                      Expanded(flex: 1, child: Text(attendanceModel.latitude!)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Longitude")),
+                          flex: 1,
+                          child: Text("English Date",
+                              style: TextStyle(fontSize: textSize))),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.longitude!)),
+                          flex: 1,
+                          child: Text(attendanceModel.englishDate!,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Device Id")),
-                      Expanded(flex: 1, child: Text(attendanceModel.deviceId)),
-                    ],
-                  ),
-                  Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Network Id")),
                       Expanded(
-                          flex: 1, child: Text(attendanceModel.networkId!)),
+                          flex: 1,
+                          child: Text("Attend Time",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(currentTime,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
                   Row(
                     children: [
-                      const Expanded(flex: 1, child: Text("Attitude")),
-                      Expanded(flex: 1, child: Text(attendanceModel.altitude!)),
-                    ],
-                  ),Row(
-                    children: [
-                      const Expanded(flex: 1, child: Text("Status")),
-                      Expanded(flex: 1, child: Text(attendanceModel.status!)),
+                      Expanded(
+                          flex: 1,
+                          child: Text("Latitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.latitude!,
+                              style: TextStyle(fontSize: textSize))),
                     ],
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                        attendanceDetails();
-                      },
-                      child: const Text("Set Attendance Details")),
-                  ElevatedButton(
-                      onPressed: () {
-                        showDialog<String>(
-                          context: context,
-                          builder: (BuildContext context) => AlertDialog(
-                            title: const Text("Are you sure?"),
-                            content: const Text(
-                                "Please check out after you have finished work."),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    checkConnection();
-                                  },
-                                  child: const Text("Conform"))
-                            ],
-                          ),
-                        );
-                      },
-                      child: const Text("Post Attendance")),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Longitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.longitude!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Device Id",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.deviceId,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Network Id",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.networkId!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Attitude",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.altitude!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                          flex: 1,
+                          child: Text("Status",
+                              style: TextStyle(fontSize: textSize))),
+                      Expanded(
+                          flex: 1,
+                          child: Text(attendanceModel.status!,
+                              style: TextStyle(fontSize: textSize))),
+                    ],
+                  ),
+                  // Row(
+                  //   children: [
+                  //     Expanded(
+                  //         flex: 1,
+                  //         child: Text("Phone Number",
+                  //             style: TextStyle(fontSize: textSize))),
+                  //     Expanded(
+                  //       flex: 1,
+                  //       child: PhoneFieldHint(
+                  //         controller: phoneNumberController,
+                  //       ),
+                  //     ),
+                  //   ],
+                  // ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      // ElevatedButton(
+                      //     onPressed: () {
+                      //       attendanceDetails();
+                      //     },
+                      //     child: const Text("Update Information")),
+                      ElevatedButton(
+                          onPressed: () {
+                            showDialog<String>(
+                              context: context,
+                              builder: (BuildContext context) => AlertDialog(
+                                title:
+                                    const Text("के तपाईं पक्का हुनुहुन्छ ? "),
+                                content: const Text(
+                                    "के तपाई कार्यालयबाट बाहिरिदै हो ?"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        // checkPhoneNumber();
+                                        checkConnection();
+                                      },
+                                      child: const Text("Conform"))
+                                ],
+                              ),
+                            );
+                          },
+                          child: const Text("हाजिर गर्नुहोस्")),
+                    ],
+                  ),
                 ],
               ),
             )

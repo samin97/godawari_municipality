@@ -34,99 +34,105 @@ class _EventListScreenState extends State<EventListScreen> {
       print(list);
       return list;
     } else {
-      throw Exception('Failed to load attendance log');
+      throw Exception('Failed to load event log');
     }
+  }
+  Future<bool> _onWillPop() async{
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          'Event List',
-          style: TextStyle(
-            fontSize: 30,
-            color: Colors.white,
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          title: const Text(
+            'इभेन्टहरू',
+            style: TextStyle(
+              fontSize: 30,
+              color: Colors.white,
+            ),
+          ),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white),
+            onPressed: () {
+              Route newRoute =
+                  MaterialPageRoute(builder: (_) => const HomeScreen());
+              Navigator.pushReplacement(context, newRoute);
+            },
           ),
         ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Route newRoute =
-                MaterialPageRoute(builder: (_) => const HomeScreen());
-            Navigator.pushReplacement(context, newRoute);
-          },
-        ),
-      ),
-      body: FutureBuilder<List<EventModel>>(
-        future: fetchEvents(),
-        builder: (context, AsyncSnapshot snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-          if (snapshot.hasData) {
-            List<EventModel> eventList = snapshot.data;
-            print(eventList);
-            return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (context, index) {
-                  return InkWell(
-                    child: Card(
-                      margin: const EdgeInsets.all(8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      elevation: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Column(
-                          children: [
-                            const SizedBox(
-                              height: 10,
-                            ),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    const Text("ID : "),
-                                    Text(eventList[index].id.toString()),
-                                    Text(eventList[index].name.toString()),
-                                    Text(eventList[index]
-                                        .shortDescription
-                                        .toString()),
-                                  ],
-                                ),
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: const [
-                                    //image
-                                  ],
-                                ),
-                              ],
-                            )
-                          ],
+        body: FutureBuilder<List<EventModel>>(
+          future: fetchEvents(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            if (snapshot.hasData) {
+              List<EventModel> eventList = snapshot.data;
+              print(eventList);
+              return ListView.builder(
+                  itemCount: snapshot.data.length,
+                  itemBuilder: (context, index) {
+                    return InkWell(
+                      child: Card(
+                        margin: const EdgeInsets.all(8.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        elevation: 0,
+                        child: Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: Column(
+                            children: [
+                              const SizedBox(
+                                height: 10,
+                              ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      const Text("ID : "),
+                                      Text(eventList[index].id.toString()),
+                                      Text(eventList[index].name.toString()),
+                                      Text(eventList[index]
+                                          .shortDescription
+                                          .toString()),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: const [
+                                      //image
+                                    ],
+                                  ),
+                                ],
+                              )
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                    onTap: () {
-                      Route newRoute = MaterialPageRoute(
-                          builder: (_) =>
-                              EventDetails(eventModel: eventList[index]));
-                    },
-                  );
-                });
-          } else {
-            return const Center(
-              child: Text("There is no ongoing event that is related to you."),
-            );
-          }
-        },
+                      onTap: () {
+                        Route newRoute = MaterialPageRoute(
+                            builder: (_) =>
+                                EventDetails(eventModel: eventList[index]));
+                      },
+                    );
+                  });
+            } else {
+              return const Center(
+                child: Text("कुनैपनि इभेन्टहरू उपलब्ध छैनन् ।"),
+              );
+            }
+          },
+        ),
       ),
     );
   }

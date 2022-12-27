@@ -1,34 +1,32 @@
-
 import 'package:flutter/material.dart';
-import 'package:municpality_app/main_screen/leave/user/post_leave.dart';
-import 'package:municpality_app/main_screen/leave/user/rejected_leave.dart';
+import 'package:municpality_app/main_screen/kaaj/user/get_approved_kaaj.dart';
+import 'package:municpality_app/main_screen/kaaj/user/get_canceled_kaaj.dart';
+import 'package:municpality_app/main_screen/kaaj/user/request_kaaj.dart';
 import '../../home_screen.dart';
-import 'all_leave.dart';
-import 'approved_leave.dart';
 
-class LeaveCategory extends StatefulWidget {
-  const LeaveCategory({Key? key}) : super(key: key);
+class Kaaj extends StatefulWidget {
+  const Kaaj({Key? key}) : super(key: key);
 
   @override
-  _LeaveCategoryState createState() => _LeaveCategoryState();
+  _KaajState createState() => _KaajState();
 }
 
-class _LeaveCategoryState extends State<LeaveCategory> {
+class _KaajState extends State<Kaaj> {
+
   Future<bool> _onWillPop() async{
     return false;
   }
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-
       onWillPop: _onWillPop,
       child: DefaultTabController(
-          length: 3,
+          length: 2,
           child: Scaffold(
             appBar: AppBar(
               automaticallyImplyLeading: false,
               title: const Text(
-                'बिदा विवरण',
+                'काज',
                 style: TextStyle(
                   fontSize: 30,
                   color: Colors.white,
@@ -47,46 +45,33 @@ class _LeaveCategoryState extends State<LeaveCategory> {
                 tabs: [
                   Tab(
                     icon: Icon(
-                      Icons.all_inbox_rounded,
-                      color: Colors.white,
-                    ),
-                    text: "सबै बिदाहरु",
-                  ),
-                  Tab(
-                    icon: Icon(
                       Icons.check,
                       color: Colors.white,
                     ),
-                    text: "स्वीकृत बिदाहरु",
+                    text: "स्वीकृत काज",
                   ),
                   Tab(
                     icon: Icon(
-                      Icons.cancel_outlined,
+                      Icons.cancel,
                       color: Colors.white,
                     ),
-                    text: "अस्वीकृत बिदाहरु",
-                  )
+                    text: "अस्वीकृत काज",
+                  ),
                 ],
                 indicatorColor: Colors.white38,
                 indicatorWeight: 7,
               ),
             ),
-            body: Container(
-              decoration: const BoxDecoration(
-
-              ),
-              child:  const TabBarView(
-                children: [
-                  AllLeave(),
-                  ApprovedLeave(),
-                  CanceledLeave(),
-                ],
-              ),
+            body: const TabBarView(
+              children: [
+                ApprovedKaaj(),
+                CanceledKaaj(),
+              ],
             ),
             floatingActionButton: FloatingActionButton(
               onPressed: () {
                 Route newRoute =
-                    MaterialPageRoute(builder: (_) => const LeaveForm());
+                    MaterialPageRoute(builder: (_) => const RequestKaaj());
                 Navigator.pushReplacement(context, newRoute);
               },
               child: RichText(

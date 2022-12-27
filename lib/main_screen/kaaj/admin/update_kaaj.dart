@@ -1,20 +1,21 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:municpality_app/main_screen/kaaj/admin/update_kaaj_details.dart';
+import 'package:municpality_app/models/admin_kaaj_model.dart';
 import '../../../global/global.dart';
 import '../../../models/admin_leave_model.dart';
 import 'package:http/http.dart' as http;
 import '../../home_screen.dart';
-import 'leave_status_details.dart';
 
-class LeaveStatus extends StatefulWidget {
-  const LeaveStatus({Key? key}) : super(key: key);
+class UpdateKaaj extends StatefulWidget {
+  const UpdateKaaj({Key? key}) : super(key: key);
 
   @override
-  State<LeaveStatus> createState() => _LeaveStatusState();
+  State<UpdateKaaj> createState() => _UpdateKaajState();
 }
 
-class _LeaveStatusState extends State<LeaveStatus> {
-  Future<List<AdminGetLeaveModel>> adminGetLeave() async {
+class _UpdateKaajState extends State<UpdateKaaj> {
+  Future<List<AdminGetKaajModel>> adminGetKaaj() async {
     final token = sharedPreferences!.getString("token")!;
     final response = await http.get(
       Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/GetLeaveForAdmin'),
@@ -26,8 +27,8 @@ class _LeaveStatusState extends State<LeaveStatus> {
     if (response.statusCode == 200) {
       List<dynamic> parsed =
           json.decode(response.body).cast<Map<String, dynamic>>();
-      List<AdminGetLeaveModel> list = [];
-      list = parsed.map((json) => AdminGetLeaveModel.fromJson(json)).toList();
+      List<AdminGetKaajModel> list = [];
+      list = parsed.map((json) => AdminGetKaajModel.fromJson(json)).toList();
       return list;
     } else {
       throw Exception('Failed to load leave log');
@@ -39,7 +40,7 @@ class _LeaveStatusState extends State<LeaveStatus> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Admin Leave',
+          'Admin Kaaj',
           style: TextStyle(
             fontSize: 30,
             color: Colors.white,
@@ -56,8 +57,8 @@ class _LeaveStatusState extends State<LeaveStatus> {
           },
         ),
       ),
-      body: FutureBuilder<List<AdminGetLeaveModel>>(
-        future: adminGetLeave(),
+      body: FutureBuilder<List<AdminGetKaajModel>>(
+        future: adminGetKaaj(),
         builder: (context, AsyncSnapshot snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -65,7 +66,7 @@ class _LeaveStatusState extends State<LeaveStatus> {
             );
           }
           if (snapshot.hasData) {
-            List<AdminGetLeaveModel> leaveList = snapshot.data;
+            List<AdminGetKaajModel> kaajList = snapshot.data;
             return ListView.builder(
                 itemCount: snapshot.data.length,
                 itemBuilder: (context, index) {
@@ -83,35 +84,32 @@ class _LeaveStatusState extends State<LeaveStatus> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Requested by: " +
-                                        leaveList[index].requestedBy.toString()),
-                                    Text("Reason: " +
-                                        leaveList[index].leaveFor.toString())
-                                  ],
-                                ),
-
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("Start Date: " +
-                                        leaveList[index].leaveDate.toString()),
-                                    Text("End Date: " +
-                                        leaveList[index].leaveTo.toString()),
-                                  ],
-                                )
+                                Flexible(
+                                    flex: 3,
+                                    child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: Text("Bhraman Start Date: " +
+                                            kaajList[index]
+                                                .bhramanStartDate
+                                                .toString()))),
+                                Flexible(
+                                    flex: 3,
+                                    child: Align(
+                                        alignment: Alignment.topRight,
+                                        child: Text("Bhraman End Date: " +
+                                            kaajList[index]
+                                                .bhramanEndDate
+                                                .toString())))
                               ],
                             ),
-
-
+                            Text("Place For Visit: " +
+                                kaajList[index].placeForVisit.toString()),
                           ],
                         ),
                         onTap: () {
                           Route newRoute = MaterialPageRoute(
-                              builder: (_) => LeaveStatusDetails(
-                                    adminGetLeaveModel: leaveList[index],
+                              builder: (_) => UpdateKaajDetails(
+                                    adminGetKaajModel: kaajList[index],
                                   ));
                           Navigator.pushReplacement(context, newRoute);
                         },

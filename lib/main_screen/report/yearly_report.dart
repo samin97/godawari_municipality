@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -15,13 +14,12 @@ class ReportYear extends StatefulWidget {
 }
 
 class _ReportYearState extends State<ReportYear> {
-
   DateTime? selectedDate;
   late String value;
 
   String getText() {
     if (selectedDate == null) {
-      return 'Select';
+      return 'आ.व. छान्नुहोस्';
     } else {
       return DateFormat('yyyy').format(selectedDate!);
     }
@@ -35,12 +33,8 @@ class _ReportYearState extends State<ReportYear> {
     final selected = await showMonthYearPicker(
       context: context,
       initialDate: selectedDate ?? DateTime.now(),
-      firstDate: DateTime(DateTime
-          .now()
-          .year - 10),
-      lastDate: DateTime(DateTime
-          .now()
-          .year + 5),
+      firstDate: DateTime(DateTime.now().year - 10),
+      lastDate: DateTime(DateTime.now().year + 5),
       locale: localeObj,
       initialMonthYearPickerMode: MonthYearPickerMode.year,
     );
@@ -51,27 +45,27 @@ class _ReportYearState extends State<ReportYear> {
       });
     }
   }
-  validate(){
-    if(selectedDate == null){
+
+  validate() {
+    if (selectedDate == null) {
       showDialog(
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "Please select a year",
+              message: "वर्ष छान्नुहोस् ।",
             );
           });
-    }else{
+    } else {
       //todo
       showDialog(
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "Function not available at the moment",
+              message: "वार्षिक प्रतिवेदनको लागि विवरण उपलब्ध हुन सकेन ।",
             );
           });
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -80,30 +74,29 @@ class _ReportYearState extends State<ReportYear> {
         padding: const EdgeInsets.all(22.0),
         child: Column(
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Flexible(
-                  child: Text(
-                    'Year:',
-                    style: TextStyle(
-                      fontSize: 25,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black54,
-                    ),
+                const SizedBox(height: 12),
+                const Text(
+                  'वर्ष :',
+                  style: TextStyle(
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black54,
                   ),
                 ),
-                Flexible(
-                  child: ButtonHeaderWidget(
-                    title: 'Date',
-                    text: getText(),
-                    onClicked: () => pickDate(context: context),
-                  ),
-                )
+                const SizedBox(
+                  height: 6,
+                ),
+                ButtonHeaderWidget(
+                  title: 'Date',
+                  text: getText(),
+                  onClicked: () => pickDate(context: context),
+                ),
+                const SizedBox(height: 12),
               ],
             ),
-            const SizedBox(height: 12),
-
             ElevatedButton(
                 onPressed: () {
                   validate();

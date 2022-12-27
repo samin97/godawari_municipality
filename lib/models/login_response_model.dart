@@ -10,23 +10,25 @@ class LoginResponseModel {
   LoginResponseModel({
     required this.tokenString,
     required this.username,
-    required this.firstName,
-    required this.role,
+    this.firstName,
+    this.role,
     this.nepaliName,
     required this.latitude,
     required this.longitude,
-    this.permittedDistance,
+    this.deviceId,
+    this.meters,
     this.permission,
   });
 
-  String tokenString;
-  String username;
-  String firstName;
-  String role;
+  String? tokenString;
+  String? username;
+  String? firstName;
+  String? role;
   dynamic nepaliName;
-  String latitude;
-  String longitude;
-  dynamic permittedDistance;
+  String? latitude;
+  String? longitude;
+  dynamic deviceId;
+  dynamic meters;
   dynamic permission;
 
   factory LoginResponseModel.fromJson(Map<String, dynamic> json) =>
@@ -39,7 +41,8 @@ class LoginResponseModel {
         nepaliName: json["nepaliName"],
         latitude: json["latitude"],
         longitude: json["longitude"],
-        permittedDistance: json["permittedDistance"],
+        deviceId: json["deviceId"],
+        meters: json["meters"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -51,6 +54,7 @@ class LoginResponseModel {
         "nepaliName": nepaliName,
         "latitude": latitude,
         "longitude": longitude,
-        "permittedDistance": permittedDistance,
+        "deviceId": deviceId,
+        "meters": meters,
       };
 }

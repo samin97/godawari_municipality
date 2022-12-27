@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:municpality_app/main_screen/kaaj/user/kaaj.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:path/path.dart';
@@ -11,52 +12,41 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import '../../../global/widgets/error_dialog.dart';
 import '../../home_screen.dart';
-import 'leave_category.dart';
 
-class LeaveForm extends StatefulWidget {
-  const LeaveForm({Key? key}) : super(key: key);
+class RequestKaaj extends StatefulWidget {
+  const RequestKaaj({Key? key}) : super(key: key);
 
   @override
-  State<LeaveForm> createState() => _LeaveFormState();
+  State<RequestKaaj> createState() => _RequestKaajState();
 }
 
-class _LeaveFormState extends State<LeaveForm> {
-  final leaveFor = [
-    'बिरामी बिदा',
-    'सुत्केरी बिदा',
-    'बेतलवी बिदा',
-    'घर बिदा',
-    'पर्व बिदा',
-    'अवकाशीय बिदा',
-    'अन्य',
-  ];
-
-  NepaliDateTime? leaveStartDate;
-  NepaliDateTime? leaveEndDate;
-
-  String? value;
+class _RequestKaajState extends State<RequestKaaj> {
+  NepaliDateTime? bhramanStartDate;
+  NepaliDateTime? bhramanEndDate;
   TextEditingController description = TextEditingController();
+  TextEditingController placeForVisit = TextEditingController();
+  TextEditingController peskiRakam = TextEditingController();
 
   String getStartDateText() {
-    if (leaveStartDate == null) {
-      return 'बिदा  सुरु मिति';
+    if (bhramanStartDate == null) {
+      return 'काजको सुरू मिति ';
     } else {
-      return DateFormat('MM/dd/yyyy').format(leaveStartDate!);
+      return DateFormat('MM/dd/yyyy').format(bhramanStartDate!);
     }
   }
 
   String getEndDateText() {
-    if (leaveEndDate == null) {
-      return 'बिदा  समप्त मिति';
+    if (bhramanEndDate == null) {
+      return 'काज सकिने मिति ';
     } else {
-      return DateFormat('MM/dd/yyyy').format(leaveEndDate!);
+      return DateFormat('MM/dd/yyyy').format(bhramanEndDate!);
     }
   }
 
-  Future pickLeaveStartDate(BuildContext context) async {
+  Future pickBhramanStartDate(BuildContext context) async {
     NepaliDateTime? _selectedDateTime = await showAdaptiveDatePicker(
       context: context,
-      initialDate: leaveStartDate ?? NepaliDateTime.now(),
+      initialDate: bhramanStartDate ?? NepaliDateTime.now(),
       firstDate: NepaliDateTime(2079, 1, 1),
       lastDate: NepaliDateTime(2099, 12, 12),
       dateOrder: DateOrder.dmy,
@@ -64,13 +54,13 @@ class _LeaveFormState extends State<LeaveForm> {
       initialDatePickerMode: DatePickerMode.day,
     );
     if (_selectedDateTime == null) return;
-    setState(() => leaveStartDate = _selectedDateTime);
+    setState(() => bhramanStartDate = _selectedDateTime);
   }
 
-  Future pickLeaveEndDate(BuildContext context) async {
+  Future pickBhramanEndDate(BuildContext context) async {
     NepaliDateTime? _selectedDateTime = await showAdaptiveDatePicker(
       context: context,
-      initialDate: leaveEndDate ?? NepaliDateTime.now(),
+      initialDate: bhramanEndDate ?? NepaliDateTime.now(),
       firstDate: NepaliDateTime(2079, 1, 1),
       lastDate: NepaliDateTime(2099, 12, 12),
       dateOrder: DateOrder.dmy,
@@ -78,7 +68,7 @@ class _LeaveFormState extends State<LeaveForm> {
       initialDatePickerMode: DatePickerMode.day,
     );
     if (_selectedDateTime == null) return;
-    setState(() => leaveEndDate = _selectedDateTime);
+    setState(() => bhramanEndDate = _selectedDateTime);
   }
 
   File? aanurodhPatraImage;
@@ -97,27 +87,17 @@ class _LeaveFormState extends State<LeaveForm> {
   }
 
   validate() {
-    if ((leaveEndDate != null) && (leaveStartDate != null)) {
-      print(value);
-      if (value != null) {
-
-        if (aanurodhPatraImage != null) {
-          uploadImage();
-        } else {
-          showDialog(
-              context: this.context,
-              builder: (c) {
-                return const ErrorDialog(
-                  message: "अनुरोध पत्र समाबेश गर्नुहोला । ",
-                );
-              });
-        }
+    if ((bhramanStartDate != null) && (bhramanEndDate != null)) {
+      if (description.text.isNotEmpty &&
+          peskiRakam.text.isNotEmpty &&
+          placeForVisit.text.isNotEmpty) {
+        uploadImage();
       } else {
         showDialog(
             context: this.context,
             builder: (c) {
               return const ErrorDialog(
-                message: "छुट्टीको कारण छान्नुहोस् ।",
+                message: "काजको लागि सबै विवरणहरू भर्नुहोला । ",
               );
             });
       }
@@ -126,7 +106,7 @@ class _LeaveFormState extends State<LeaveForm> {
           context: this.context,
           builder: (c) {
             return const ErrorDialog(
-              message: " कृपाय छुट्टी सुरू तथा समाप्त हुने मिति छान्नुहोला ",
+              message: "कृपाय काजको सुरू तथा समाप्त हुने मिति छान्नुहोला । ",
             );
           });
     }
@@ -137,10 +117,11 @@ class _LeaveFormState extends State<LeaveForm> {
       showLoading = true;
     });
 
+    var aanurodhPatraStream = http.ByteStream(aanurodhPatraImage!.openRead());
     final token = sharedPreferences!.getString("token")!;
-    print(leaveStartDate);
-    print(leaveEndDate);
-    var uri = Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/RequestLeave');
+
+    var aanurodhPatraLength = await aanurodhPatraImage!.length();
+    var uri = Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/Requestkaaj');
 
     var request = http.MultipartRequest("POST", (uri));
     Map<String, String> headers = {
@@ -148,32 +129,23 @@ class _LeaveFormState extends State<LeaveForm> {
       "Authorization": "Bearer $token"
     };
     var nepaliDate = NepaliDateFormat("yyyy/MM/dd");
-    var nepaliDate1 = NepaliDateFormat("yyyy/MM/dd");
-    final String formattedLeaveStartDate = nepaliDate.format(leaveStartDate!);
-    final String formattedLeaveEndDate = nepaliDate1.format(leaveEndDate!);
-    request.fields['LeaveDate'] = formattedLeaveStartDate;
-    request.fields['LeaveTo'] = formattedLeaveEndDate;
-    request.fields['LeaveFor'] = value.toString();
+    final String formattedBhramanStartDate =
+        nepaliDate.format(bhramanStartDate!);
+    final String formattedBhramanEndDate = nepaliDate.format(bhramanEndDate!);
+    request.fields['BhramanStartDate'] = formattedBhramanStartDate;
+    request.fields['BhramanEndDate'] = formattedBhramanEndDate;
+    request.fields['PlaceForVisit'] = placeForVisit.text;
+    request.fields['PeskiRakam'] = peskiRakam.text;
     request.fields['Description'] = description.text;
-    print(formattedLeaveStartDate);
-    print(formattedLeaveEndDate);
-    if (formattedLeaveEndDate == formattedLeaveStartDate) {
-      print('same');
-    }
 
-    if (aanurodhPatraImage != null) {
-      var aanurodhPatraStream = http.ByteStream(aanurodhPatraImage!.openRead());
-      var aanurodhPatraLength = await aanurodhPatraImage!.length();
+    var multipartAanurodhPatra = http.MultipartFile(
+        'AanurodhPatra', aanurodhPatraStream, aanurodhPatraLength,
+        filename: basename(aanurodhPatraImage!.path));
 
-      var multipartAanurodhPatra = http.MultipartFile(
-          'AanurodhPatra', aanurodhPatraStream, aanurodhPatraLength,
-          filename: basename(aanurodhPatraImage!.path));
-
-      request.files.add(multipartAanurodhPatra);
-    }
+    request.files.add(multipartAanurodhPatra);
     request.headers.addAll(headers);
+
     var response = await request.send();
-    print(response.statusCode);
 
     if (response.statusCode == 200) {
       // var s = response.body.toString();
@@ -186,7 +158,7 @@ class _LeaveFormState extends State<LeaveForm> {
           context: this.context,
           builder: (c) {
             return const ErrorDialog(
-              message: "विवरण पेश गर्न असमर्थन हुनुभयो । कृपया पुनःप्रयास गर्नुहोला । ",
+              message: "काजको विवरण पेश गर्न असमर्थन हुनुभयो । कृपया पुनःप्रयास गर्नुहोला । ",
             );
           });
     }
@@ -194,10 +166,12 @@ class _LeaveFormState extends State<LeaveForm> {
       setState(() {
         showLoading = false;
       });
+      print("Image uploaded");
     } else {
       setState(() {
         showLoading = false;
       });
+      print('Failed');
     }
   }
 
@@ -215,7 +189,7 @@ class _LeaveFormState extends State<LeaveForm> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             title: const Text(
-              'बिदा सम्बन्धि अनुरोध फारम',
+              'काज सम्बन्धी फारम',
               style: TextStyle(
                 fontSize: 30,
                 color: Colors.white,
@@ -227,7 +201,7 @@ class _LeaveFormState extends State<LeaveForm> {
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
                 Route newRoute =
-                    MaterialPageRoute(builder: (_) => const LeaveCategory());
+                    MaterialPageRoute(builder: (_) => const Kaaj());
                 Navigator.pushReplacement(context, newRoute);
               },
             ),
@@ -243,9 +217,9 @@ class _LeaveFormState extends State<LeaveForm> {
                     children: [
                       Flexible(
                         child: ButtonHeaderWidget(
-                          title: 'Leave Start Date',
+                          title: 'Bhraman Start Date',
                           text: getStartDateText(),
-                          onClicked: () => pickLeaveStartDate(context),
+                          onClicked: () => pickBhramanStartDate(context),
                         ),
                       ),
                       const SizedBox(
@@ -253,46 +227,46 @@ class _LeaveFormState extends State<LeaveForm> {
                       ),
                       Flexible(
                         child: ButtonHeaderWidget(
-                          title: 'Leave End Date',
+                          title: 'Bhraman End Date',
                           text: getEndDateText(),
-                          onClicked: () => pickLeaveEndDate(context),
+                          onClicked: () => pickBhramanEndDate(context),
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Flexible(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 2),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(5),
-                            border: Border.all(color: Colors.black),
-                          ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton(
-                              value: value,
-                              hint: const Text(
-                                "बिदाको कारण",
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.black),
-                              ),
-                              dropdownColor: Colors.white,
-                              isExpanded: true,
-                              items: leaveFor.map(buildMenuItems).toList(),
-                              onChanged: (value) => setState(
-                                () {
-                                  this.value = value as String?;
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
+                  TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                    decoration: const InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                    ],
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
+                      ),
+                      hintText: 'काजको भ्रमन गरिने ठाँउको ठेगान',
+                      hintStyle: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    controller: placeForVisit,
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    keyboardType: TextInputType.multiline,
+                    maxLines: 1,
+                    style: const TextStyle(fontSize: 20, color: Colors.black),
+                    decoration: const InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.black, width: 1.0),
+                      ),
+                      hintText: 'पेश्की रकम',
+                      hintStyle: TextStyle(fontSize: 20, color: Colors.black),
+                    ),
+                    controller: peskiRakam,
                   ),
                   const SizedBox(height: 12),
                   TextField(
@@ -306,7 +280,7 @@ class _LeaveFormState extends State<LeaveForm> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                      hintText: 'बिदाको विवरण',
+                      hintText: 'काजको थप विवरण',
                       hintStyle: TextStyle(fontSize: 20, color: Colors.black),
                     ),
                     controller: description,
@@ -321,14 +295,14 @@ class _LeaveFormState extends State<LeaveForm> {
                         borderRadius: BorderRadius.circular(5),
                         color: Colors.white,
                         border: Border.all(color: Colors.black, width: 1)),
-                    child: const Text("बिदा सम्बन्धिको पत्र अपलोड गर्नुहोस् :",
+                    child: const Text("काज सम्बन्धिको पत्र अपलोड गर्नुहोस् : ",
                         style: TextStyle(fontSize: 20)),
                   ),
                   const SizedBox(
                     height: 12,
                   ),
                   Container(
-                    height: 150,
+                    height: 175,
                     width: 150,
                     decoration: BoxDecoration(
                       border: Border.all(
@@ -345,7 +319,7 @@ class _LeaveFormState extends State<LeaveForm> {
                               ? const Center(
                                   child: Icon(
                                     Icons.image_search,
-                                    size: 60,
+                                    size: 30,
                                   ),
                                 )
                               : Center(
@@ -356,6 +330,9 @@ class _LeaveFormState extends State<LeaveForm> {
                                   fit: BoxFit.cover,
                                 ))),
                     ),
+                  ),
+                  const SizedBox(
+                    height: 12,
                   ),
                   const SizedBox(
                     height: 12,

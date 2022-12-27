@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:nepali_date_picker/nepali_date_picker.dart';
@@ -30,22 +29,33 @@ class _LeaveFormState extends State<LeaveForm> {
     'Vacation leave',
     'Others'
   ];
-  NepaliDateTime? selectedDate;
+
+  NepaliDateTime? leaveStartDate;
+  NepaliDateTime? leaveEndDate;
+
   String? value;
   TextEditingController description = TextEditingController();
 
-  String getText() {
-    if (selectedDate == null) {
-      return 'Leave Date';
+  String getStartDateText() {
+    if (leaveStartDate == null) {
+      return 'Leave Start Date';
     } else {
-      return DateFormat('MM/dd/yyyy').format(selectedDate!);
+      return DateFormat('MM/dd/yyyy').format(leaveStartDate!);
     }
   }
 
-  Future pickDate(BuildContext context) async {
+  String getEndDateText() {
+    if (leaveEndDate == null) {
+      return 'Leave End Date';
+    } else {
+      return DateFormat('MM/dd/yyyy').format(leaveEndDate!);
+    }
+  }
+
+  Future pickLeaveStartDate(BuildContext context) async {
     NepaliDateTime? _selectedDateTime = await showAdaptiveDatePicker(
       context: context,
-      initialDate: selectedDate ?? NepaliDateTime.now(),
+      initialDate: leaveStartDate ?? NepaliDateTime.now(),
       firstDate: NepaliDateTime(2079, 1, 1),
       lastDate: NepaliDateTime(2099, 12, 12),
       dateOrder: DateOrder.dmy,
@@ -53,19 +63,34 @@ class _LeaveFormState extends State<LeaveForm> {
       initialDatePickerMode: DatePickerMode.day,
     );
     if (_selectedDateTime == null) return;
-    setState(() => selectedDate = _selectedDateTime);
+    setState(() => leaveStartDate = _selectedDateTime);
   }
 
-  File? image;
-  final _picker = ImagePicker();
+  Future pickLeaveEndDate(BuildContext context) async {
+    NepaliDateTime? _selectedDateTime = await showAdaptiveDatePicker(
+      context: context,
+      initialDate: leaveEndDate ?? NepaliDateTime.now(),
+      firstDate: NepaliDateTime(2079, 1, 1),
+      lastDate: NepaliDateTime(2099, 12, 12),
+      dateOrder: DateOrder.dmy,
+      language: NepaliUtils().language,
+      initialDatePickerMode: DatePickerMode.day,
+    );
+    if (_selectedDateTime == null) return;
+    setState(() => leaveEndDate = _selectedDateTime);
+  }
+
+  File? aanurodhPatraImage;
+  final aanurodhPatraPicker = ImagePicker();
+
   bool showLoading = false;
 
-  Future getImage() async {
-    final pickedFile =
-        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 70);
+  Future getImageAanurodhPatra() async {
+    final pickedFile = await aanurodhPatraPicker.pickImage(
+        source: ImageSource.gallery, imageQuality: 70);
 
     if (pickedFile != null) {
-      image = File(pickedFile.path);
+      aanurodhPatraImage = File(pickedFile.path);
       setState(() {});
     }
   }
@@ -75,10 +100,10 @@ class _LeaveFormState extends State<LeaveForm> {
       showLoading = true;
     });
 
-    var stream = http.ByteStream(image!.openRead());
+    var aanurodhPatraStream = http.ByteStream(aanurodhPatraImage!.openRead());
     final token = sharedPreferences!.getString("token")!;
 
-    var length = await image!.length();
+    var aanurodhPatraLength = await aanurodhPatraImage!.length();
     var uri = Uri.parse('http://mis.godawarimun.gov.np/Api/Leave/RequestLeave');
 
     var request = http.MultipartRequest("POST", (uri));
@@ -87,21 +112,22 @@ class _LeaveFormState extends State<LeaveForm> {
       "Authorization": "Bearer $token"
     };
     var nepaliDate = NepaliDateFormat("yyyy/MM/dd");
-    final String nepaliFormatted = nepaliDate.format(selectedDate!);
-    print(nepaliFormatted);
-
-    request.fields['LeaveDate'] = nepaliFormatted;
+    final String formattedLeaveStartDate = nepaliDate.format(leaveStartDate!);
+    final String formattedLeaveEndDate = nepaliDate.format(leaveEndDate!);
+    request.fields['LeaveDate'] = formattedLeaveStartDate;
+    request.fields['LeaveTo'] = formattedLeaveEndDate;
     request.fields['LeaveFor'] = value.toString();
     request.fields['Description'] = description.text;
 
-    var multipart = http.MultipartFile('Signature', stream, length,
-        filename: basename(image!.path));
+    var multipartAanurodhPatra = http.MultipartFile(
+        'AanurodhPatra', aanurodhPatraStream, aanurodhPatraLength,
+        filename: basename(aanurodhPatraImage!.path));
 
-    request.files.add(multipart);
+    request.files.add(multipartAanurodhPatra);
     request.headers.addAll(headers);
 
     var response = await request.send();
-
+    print(response.statusCode);
     if (response.statusCode == 200) {
       // var s = response.body.toString();
       ScaffoldMessenger.of(this.context)
@@ -166,21 +192,33 @@ class _LeaveFormState extends State<LeaveForm> {
                   children: [
                     Flexible(
                       child: ButtonHeaderWidget(
-                        title: 'Leave Date',
-                        text: getText(),
-
-                        onClicked: () => pickDate(context),
+                        title: 'Leave Start Date',
+                        text: getStartDateText(),
+                        onClicked: () => pickLeaveStartDate(context),
                       ),
                     ),
                     const SizedBox(
                       width: 10,
                     ),
                     Flexible(
+                      child: ButtonHeaderWidget(
+                        title: 'Leave End Date',
+                        text: getEndDateText(),
+                        onClicked: () => pickLeaveEndDate(context),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Flexible(
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12, vertical: 2),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(5),
                           border: Border.all(color: Colors.black),
                         ),
                         child: DropdownButtonHideUnderline(
@@ -205,7 +243,7 @@ class _LeaveFormState extends State<LeaveForm> {
                 TextField(
                   keyboardType: TextInputType.multiline,
                   maxLines: 6,
-                  decoration:  const InputDecoration(
+                  decoration: const InputDecoration(
                       border: OutlineInputBorder(),
                       hintText: 'Leave Description'),
                   controller: description,
@@ -213,22 +251,34 @@ class _LeaveFormState extends State<LeaveForm> {
                 const SizedBox(
                   height: 12,
                 ),
+                const Text("Aanurodh Patra Image:"),
+                const SizedBox(
+                  height: 12,
+                ),
                 Container(
-                  height: 150,
-                  width: 150,
-                  color: Colors.grey[100],
+                  height: 250,
+                  width: 200,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                    ),
+                    color: Colors.grey[100],
+                  ),
                   child: InkWell(
                     onTap: () {
-                      getImage();
+                      getImageAanurodhPatra();
                     },
                     child: Container(
-                        child: image == null
+                        child: aanurodhPatraImage == null
                             ? const Center(
-                                child: Icon(Icons.image_search, size: 60,),
+                                child: Icon(
+                                  Icons.image_search,
+                                  size: 60,
+                                ),
                               )
                             : Center(
                                 child: Image.file(
-                                File(image!.path).absolute,
+                                File(aanurodhPatraImage!.path).absolute,
                                 height: 150,
                                 width: 150,
                                 fit: BoxFit.cover,

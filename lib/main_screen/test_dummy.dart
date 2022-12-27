@@ -25,7 +25,7 @@ class _AttendanceReportState extends State<AttendanceReport> {
       deviceId: 'deviceId',
       networkId: 'networkId',
       altitude: 'altitude',
-      status: 'check-in');
+      status: 'check-in', mobileNo: 'mobileNo');
 
   Future<List<AttendanceModel>> fetchAttendance() async {
     final token = sharedPreferences!.getString("token")!;

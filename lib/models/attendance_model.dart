@@ -15,6 +15,7 @@ class AttendanceModel {
     required this.networkId,
     required this.altitude,
     required this.status,
+    required this.mobileNo,
   });
 
   String? nepaliDate;
@@ -26,6 +27,7 @@ class AttendanceModel {
   String? networkId;
   String? altitude;
   String? status;
+  String? mobileNo;
 
   factory AttendanceModel.fromJson(Map<String, dynamic> json) => AttendanceModel(
     nepaliDate: json["nepaliDate"],
@@ -37,6 +39,7 @@ class AttendanceModel {
     networkId: json["networkId"],
     altitude: json["altitude"],
     status: json["status"],
+    mobileNo: json["mobileNo"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -49,5 +52,6 @@ class AttendanceModel {
     "networkId": networkId,
     "altitude": altitude,
     "status": status,
+    "mobileNo": mobileNo,
   };
 }

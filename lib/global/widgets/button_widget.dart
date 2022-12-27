@@ -17,7 +17,7 @@ class ButtonHeaderWidget extends StatelessWidget {
         style: OutlinedButton.styleFrom(
           elevation: 0,
           shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
+                  borderRadius: BorderRadius.circular(5.0),
                 side: const BorderSide(
                   color: Colors.black,
                   width: 1,
@@ -29,7 +29,7 @@ class ButtonHeaderWidget extends StatelessWidget {
         child: FittedBox(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.normal),
+            style: const TextStyle(fontSize: 18, color: Colors.black, fontWeight: FontWeight.w300),
           ),
         ),
         onPressed: onClicked,

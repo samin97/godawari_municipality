@@ -15,7 +15,7 @@ class LocationModel {
   int? id;
   String? latitude;
   String? longitude;
-  int? meters;
+  String? meters;
 
   factory LocationModel.fromJson(Map<String, dynamic> json) => LocationModel(
     id: json["id"],

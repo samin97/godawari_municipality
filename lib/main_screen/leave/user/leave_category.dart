@@ -67,14 +67,7 @@ class _LeaveCategoryState extends State<LeaveCategory> {
           ),
           body: Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.white,
-                  Colors.indigoAccent,
-                ],
-              ),
+
             ),
             child:  const TabBarView(
               children: [

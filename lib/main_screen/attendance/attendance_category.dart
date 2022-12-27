@@ -56,14 +56,6 @@ class _AttendanceCategoryState extends State<AttendanceCategory> {
           ),
           body: Container(
             decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topRight,
-                end: Alignment.bottomLeft,
-                colors: [
-                  Colors.white,
-                  Colors.indigoAccent,
-                ],
-              ),
             ),
             child:   TabBarView(
               children: [

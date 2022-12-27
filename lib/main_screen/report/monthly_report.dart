@@ -67,9 +67,9 @@ class _ReportMonthState extends State<ReportMonth> {
                 ),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(5),
                     border: Border.all(color: Colors.black),
                   ),
                   child: DropdownButtonHideUnderline(

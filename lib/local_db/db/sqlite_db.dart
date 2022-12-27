@@ -12,7 +12,7 @@ class SqliteMethods implements LogInterface {
   String tableName = "Attendance_logs";
 
   //columns
-  late String id;
+  String id = "id";
   String attendDateTime = "attendDateTime";
   String nepaliDate = "nepaliDate";
   String englishDate = "englishDate";

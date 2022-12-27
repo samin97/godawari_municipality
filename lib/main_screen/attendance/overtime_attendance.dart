@@ -39,7 +39,7 @@ class _OvertimeAttendanceState extends State<OvertimeAttendance> {
       deviceId: "deviceId",
       networkId: "networkId",
       altitude: "attitude",
-      status: "status");
+      status: "status", mobileNo: 'mobileNo');
   DateTime timeNow = DateTime.now();
   final DateFormat timeFormat = DateFormat('HH:mm:ss');
   var deviceInfo;
@@ -123,9 +123,9 @@ class _OvertimeAttendanceState extends State<OvertimeAttendance> {
     double distanceInMeters = Geolocator.distanceBetween(
         position?.latitude as double,
         position?.longitude as double,
-        locationModel.latitude as double,
-        locationModel.latitude as double);
-    if (distanceInMeters < locationModel.meters!.toDouble()) {
+        double.parse(locationModel.latitude.toString()),
+        double.parse(locationModel.latitude.toString()));
+    if (distanceInMeters < double.parse(locationModel.meters!.toString())) {
       postAttendance();
     } else {
       showDialog<String>(

@@ -6,7 +6,9 @@ import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:municpality_app/main_screen/kaaj/user/kaaj.dart';
 import 'package:municpality_app/main_screen/report/report_category.dart';
+import 'package:municpality_app/main_screen/settings/settings.dart';
 import 'package:municpality_app/main_screen/test_dummy.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
@@ -23,6 +25,7 @@ import 'package:http/http.dart' as http;
 import '../models/location_permission_model.dart';
 import 'attendance/attendance_category.dart';
 import 'event/event_screen.dart';
+import 'kaaj/user/request_kaaj.dart';
 import 'leave/admin/leave_status_screen.dart';
 import 'leave/user/leave_category.dart';
 
@@ -45,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     deviceId: "deviceId",
     networkId: "networkId",
     altitude: "attitude",
-    status: "status",
+    status: "status", mobileNo: 'mobileNo',
   );
   String status = "check-in";
   String url = "http://mis.godawarimun.gov.np/Api/Attendence/AttendUser";
@@ -146,26 +149,29 @@ class _HomeScreenState extends State<HomeScreen> {
       //localStorage();
     }
   }
+  Future checkLocation() async {
 
-  checkLocation() {
-
-    LocationModel locationModel = LocationModel();
-    locationModel = fetchLocation() as LocationModel;
+    print(double.parse(sharedPreferences!.getString("latitude")!));
+    print(double.parse(sharedPreferences!.getString("longitude")!));
 
     double distanceInMeters = Geolocator.distanceBetween(
-        position?.latitude as double,
-        position?.longitude as double,
-        locationModel.latitude as double,
-        locationModel.latitude as double);
-    if (distanceInMeters < locationModel.meters!.toDouble()) {
+      position?.latitude as double,
+      position?.longitude as double,
+      double.parse(sharedPreferences!.getString("latitude")!),
+      double.parse(sharedPreferences!.getString("longitude")!),
+    );
+    print(distanceInMeters);
+    if (distanceInMeters < double.parse(sharedPreferences!.getString("permittedDistance")!) ) {
+      attendanceDetails();
       postAttendance();
     } else {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: const Text("You are too far."),
-          content: const Text(
-              "Please remain with in 20 meter of the office to post attendance"),
+          content: Text("Please remain with in " +
+              sharedPreferences!.getString("permittedDistance")! +
+              " meter of the office to post attendance"),
           actions: [
             TextButton(
                 onPressed: () {
@@ -224,7 +230,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> lastAttendance() async {
     final token = sharedPreferences!.getString("token")!;
     final response = await http.get(
-      Uri.parse('http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
+      Uri.parse(
+          'http://mis.godawarimun.gov.np/Api/Attendence/GetLastAttendence'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization': 'Bearer $token',
@@ -237,7 +244,8 @@ class _HomeScreenState extends State<HomeScreen> {
           DateFormat('yyyy/MM/dd').format(DateTime.now())) {
         setState(() {
           status = "check-out";
-          url = "http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave";
+          url =
+              "http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave";
         });
       } else {
         setState(() {
@@ -329,12 +337,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Welcome',
-          style: TextStyle(
-            fontSize: 30,
-            color: Colors.white,
-          ),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Welcome',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.white,
+              ),
+            ),
+            IconButton(
+                onPressed: () {
+                  Route newRoute =
+                      MaterialPageRoute(builder: (_) => const SettingsScreen());
+                  Navigator.pushReplacement(context, newRoute);
+                },
+                icon: const Icon(
+                  Icons.settings,
+                  color: Colors.white,
+                )),
+          ],
         ),
         centerTitle: true,
         automaticallyImplyLeading: false,
@@ -345,7 +368,6 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -354,13 +376,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     flex: 2,
                     child: CircleAvatar(
                       radius: 54,
-                      backgroundColor: Colors.blue,
+                      backgroundColor: const Color(0xFF32659F),
                       child: CircleAvatar(
-                        radius: 50,
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: NetworkImage(
-                            "https://myrepublica.nagariknetwork.com/uploads/media/Governmentlogo_20200312190212.jpg"),
-                      ),
+                          radius: 70,
+                          backgroundColor: Colors.transparent,
+                          backgroundImage:
+                              AssetImage("images/userProfile.png")),
                     ),
                   ),
                   Flexible(
@@ -433,16 +454,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           flex: 3,
                           child: AppButton(
                             textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Attendance',
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            text: 'हाजिरी',
                             onTap: () {
                               handleLocationPermission();
                               isFingerPrint = false;
                               checkHoliday();
                             },
                             icon: const Icon(Icons.co_present,
-                                color: Color(0xFF10599e)),
+                                size: 40, color: Color(0xFF10599e)),
                           ),
                         ),
                         const Spacer(
@@ -452,40 +473,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           flex: 3,
                           child: AppButton(
                             textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Fingerprint ',
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            text: 'फिङ्गरप्रिन्ट ',
                             onTap: () {
                               handleLocationPermission();
                               isFingerPrint = true;
                               checkHoliday();
                             },
                             icon: const Icon(Icons.fingerprint,
-                                color: Color(0xFF10599e)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Flexible(
-                          flex: 3,
-                          child: AppButton(
-                            textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Leave',
-                            onTap: () {
-                              Route newRoute = MaterialPageRoute(
-                                  builder: (_) => const LeaveCategory());
-                              Navigator.pushReplacement(context, newRoute);
-                            },
-                            icon: const Icon(Icons.work_off,
-                                color: Color(0xFF10599e)),
+                                size: 40, color: Color(0xFF10599e)),
                           ),
                         ),
                         const Spacer(
@@ -495,40 +492,40 @@ class _HomeScreenState extends State<HomeScreen> {
                           flex: 3,
                           child: AppButton(
                             textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Report',
-                            onTap: () {
-                              Route newRoute = MaterialPageRoute(
-                                  builder: (_) => const ReportCategory());
-                              Navigator.pushReplacement(context, newRoute);
-                            },
-                            icon: const Icon(Icons.document_scanner,
-                                color: Color(0xFF10599e)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Flexible(
-                          flex: 3,
-                          child: AppButton(
-                            textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Event',
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            text: 'इभेन्ट',
                             onTap: () {
                               Route newRoute = MaterialPageRoute(
                                   builder: (_) => const EventListScreen());
                               Navigator.pushReplacement(context, newRoute);
                             },
                             icon: const Icon(Icons.event,
-                                color: Color(0xFF10599e)),
+                                size: 40, color: Color(0xFF10599e)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Flexible(
+                          flex: 3,
+                          child: AppButton(
+                            textColour: Colors.black54,
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            text: 'बिदा',
+                            onTap: () {
+                              Route newRoute = MaterialPageRoute(
+                                  builder: (_) => const LeaveCategory());
+                              Navigator.pushReplacement(context, newRoute);
+                            },
+                            icon: const Icon(Icons.work_off,
+                                size: 40, color: Color(0xFF10599e)),
                           ),
                         ),
                         const Spacer(
@@ -538,16 +535,36 @@ class _HomeScreenState extends State<HomeScreen> {
                           flex: 3,
                           child: AppButton(
                             textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Help',
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            text: 'काज',
                             onTap: () {
                               Route newRoute = MaterialPageRoute(
-                                  builder: (_) => const AttendanceReport());
+                                  builder: (_) => const Kaaj());
                               Navigator.pushReplacement(context, newRoute);
                             },
-                            icon: const Icon(Icons.developer_mode,
-                                color: Color(0xFF10599e)),
+                            icon: const Icon(Icons.insert_drive_file_outlined,
+                                size: 40, color: Color(0xFF10599e)),
+                          ),
+                        ),
+                        const Spacer(
+                          flex: 1,
+                        ),
+                        Flexible(
+                          flex: 3,
+                          child: AppButton(
+                            textColour: Colors.black54,
+                            backgroundColor: const Color(0xFFDADADA),
+                            borderColor: const Color(0xFFC4C4C4),
+                            textSize: 12,
+                            text: 'हाजिरी प्रतिवेदन',
+                            onTap: () {
+                              Route newRoute = MaterialPageRoute(
+                                  builder: (_) => const ReportCategory());
+                              Navigator.pushReplacement(context, newRoute);
+                            },
+                            icon: const Icon(Icons.document_scanner,
+                                size: 30, color: Color(0xFF10599e)),
                           ),
                         ),
                       ],
@@ -564,14 +581,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          const Spacer(flex: 1),
                           Flexible(
-                            flex: 2,
+                            flex: 3,
                             child: AppButton(
                               textColour: Colors.black54,
-                              backgroundColor: const Color(0xFF80DEEA),
-                              borderColor: const Color(0xFF80DEEA),
-                              text: 'Admin leave',
+                              backgroundColor: const Color(0xFFDADADA),
+                              borderColor: const Color(0xFFC4C4C4),
+                              text: 'बिदा (एडमिन)',
                               onTap: () {
                                 Route newRoute = MaterialPageRoute(
                                     builder: (_) => const LeaveStatus());
@@ -579,37 +595,50 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                               icon: const Icon(
                                 Icons.leave_bags_at_home,
+                                size: 30,
                                 color: Color(0xFF10599e),
                               ),
                             ),
                           ),
                           const Spacer(flex: 1),
+                          Flexible(
+                            flex: 3,
+                            child: AppButton(
+                              textColour: Colors.black54,
+                              backgroundColor: const Color(0xFFDADADA),
+                              borderColor: const Color(0xFFC4C4C4),
+                              text: 'काज (एडमिन)',
+                              onTap: () {
+                                // Route newRoute = MaterialPageRoute(
+                                //     builder: (_) => const LeaveStatus());
+                                // Navigator.pushReplacement(context, newRoute);
+                              },
+                              icon: const Icon(
+                                Icons.account_balance_outlined,
+                                size: 30,
+                                color: Color(0xFF10599e),
+                              ),
+                            ),
+                          ),
+                          const Spacer(flex: 1),
+                          Flexible(
+                            flex: 3,
+                            child: AppButton(
+                              textColour: Colors.black54,
+                              backgroundColor: const Color(0xFFDADADA),
+                              borderColor: const Color(0xFFC4C4C4),
+                              text: 'मद्दत',
+                              onTap: () {
+                                Route newRoute = MaterialPageRoute(
+                                    builder: (_) => const AttendanceReport());
+                                Navigator.pushReplacement(context, newRoute);
+                              },
+                              icon: const Icon(Icons.developer_mode,
+                                  size: 30, color: Color(0xFF10599e)),
+                            ),
+                          ),
                         ],
                       ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const Spacer(flex: 1),
-                        Flexible(
-                          flex: 1,
-                          child: AppButton(
-                            textColour: Colors.black54,
-                            backgroundColor: const Color(0xFF80DEEA),
-                            borderColor: const Color(0xFF80DEEA),
-                            text: 'Logout',
-                            onTap: () {
-                              logoutNow();
-                            },
-                            icon: const Icon(Icons.logout,
-                                color: Color(0xFF10599e)),
-                          ),
-                        ),
-                        const Spacer(flex: 1),
-                      ],
                     ),
                   ),
                 ],

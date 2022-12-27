@@ -26,7 +26,7 @@ class _SyncAttendanceState extends State<SyncAttendance> {
       deviceId: 'deviceId',
       networkId: 'networkId',
       altitude: 'altitude',
-      status: 'status');
+      status: 'status', mobileNo: 'mobileNo');
 
   late AttendanceModel newAttendance = AttendanceModel(
       nepaliDate: 'nepaliDate',
@@ -37,7 +37,7 @@ class _SyncAttendanceState extends State<SyncAttendance> {
       deviceId: 'deviceId',
       networkId: 'networkId',
       altitude: 'altitude',
-      status: 'status');
+      status: 'status', mobileNo: 'mobileNo');
 
   @override
   Widget build(BuildContext context) {

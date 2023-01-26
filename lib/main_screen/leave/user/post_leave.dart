@@ -22,13 +22,20 @@ class LeaveForm extends StatefulWidget {
 
 class _LeaveFormState extends State<LeaveForm> {
   final leaveFor = [
-    'बिरामी बिदा',
-    'सुत्केरी बिदा',
-    'बेतलवी बिदा',
-    'घर बिदा',
-    'पर्व बिदा',
-    'अवकाशीय बिदा',
+    'बिरामी विदा',
+    'सुत्केरी विदा',
+    'बेतलवी विदा',
+    'घर विदा',
+    'पर्व विदा',
+    'अवकाशीय विदा',
     'अन्य',
+    'प्रसुती विदा',
+    'प्रसुती स्याहार विदा',
+    'किरिया विदा',
+    'अध्ययन विदा',
+    'असाधारण विदा',
+    'सट्टा विदा',
+    'पर्व/भैपरी आउने',
   ];
 
   NepaliDateTime? leaveStartDate;
@@ -39,7 +46,7 @@ class _LeaveFormState extends State<LeaveForm> {
 
   String getStartDateText() {
     if (leaveStartDate == null) {
-      return 'बिदा  सुरु मिति';
+      return 'विदा  सुरु मिति';
     } else {
       return DateFormat('MM/dd/yyyy').format(leaveStartDate!);
     }
@@ -47,7 +54,7 @@ class _LeaveFormState extends State<LeaveForm> {
 
   String getEndDateText() {
     if (leaveEndDate == null) {
-      return 'बिदा  समप्त मिति';
+      return 'विदा  समप्त मिति';
     } else {
       return DateFormat('MM/dd/yyyy').format(leaveEndDate!);
     }
@@ -100,7 +107,6 @@ class _LeaveFormState extends State<LeaveForm> {
     if ((leaveEndDate != null) && (leaveStartDate != null)) {
       print(value);
       if (value != null) {
-
         if (aanurodhPatraImage != null) {
           uploadImage();
         } else {
@@ -186,7 +192,8 @@ class _LeaveFormState extends State<LeaveForm> {
           context: this.context,
           builder: (c) {
             return const ErrorDialog(
-              message: "विवरण पेश गर्न असमर्थन हुनुभयो । कृपया पुनःप्रयास गर्नुहोला । ",
+              message:
+                  "विवरण पेश गर्न असमर्थन हुनुभयो । कृपया पुनःप्रयास गर्नुहोला । ",
             );
           });
     }
@@ -215,7 +222,7 @@ class _LeaveFormState extends State<LeaveForm> {
           backgroundColor: Colors.white,
           appBar: AppBar(
             title: const Text(
-              'बिदा सम्बन्धि अनुरोध फारम',
+              'विदा सम्बन्धि अनुरोध फारम',
               style: TextStyle(
                 fontSize: 30,
                 color: Colors.white,
@@ -276,7 +283,7 @@ class _LeaveFormState extends State<LeaveForm> {
                             child: DropdownButton(
                               value: value,
                               hint: const Text(
-                                "बिदाको कारण",
+                                "विदाको कारण",
                                 style: TextStyle(
                                     fontSize: 20, color: Colors.black),
                               ),
@@ -306,7 +313,7 @@ class _LeaveFormState extends State<LeaveForm> {
                       enabledBorder: OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black, width: 1.0),
                       ),
-                      hintText: 'बिदाको विवरण',
+                      hintText: 'विदाको विवरण',
                       hintStyle: TextStyle(fontSize: 20, color: Colors.black),
                     ),
                     controller: description,
@@ -321,7 +328,7 @@ class _LeaveFormState extends State<LeaveForm> {
                         borderRadius: BorderRadius.circular(5),
                         color: Colors.white,
                         border: Border.all(color: Colors.black, width: 1)),
-                    child: const Text("बिदा सम्बन्धिको पत्र अपलोड गर्नुहोस् :",
+                    child: const Text("विदा सम्बन्धिको पत्र अपलोड गर्नुहोस् :",
                         style: TextStyle(fontSize: 20)),
                   ),
                   const SizedBox(

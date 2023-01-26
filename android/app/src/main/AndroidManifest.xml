@@ -7,7 +7,7 @@
 
 
     <application
-        android:label="Municipality Employee"
+        android:label="Godawari Municpality App"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

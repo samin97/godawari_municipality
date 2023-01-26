@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:municpality_app/main_screen/leave/user/post_leave.dart';
-import 'package:municpality_app/main_screen/leave/user/rejected_leave.dart';
+import 'package:smart_attendance/main_screen/leave/user/post_leave.dart';
+import 'package:smart_attendance/main_screen/leave/user/rejected_leave.dart';
 import '../../home_screen.dart';
 import 'all_leave.dart';
 import 'approved_leave.dart';
@@ -75,7 +75,7 @@ class _LeaveCategoryState extends State<LeaveCategory> {
               decoration: const BoxDecoration(
 
               ),
-              child:  const TabBarView(
+              child:   TabBarView(
                 children: [
                   AllLeave(),
                   ApprovedLeave(),

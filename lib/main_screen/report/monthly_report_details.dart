@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:municpality_app/main_screen/report/report_category.dart';
+import 'package:smart_attendance/main_screen/report/report_category.dart';
 
 import '../../global/global.dart';
 import '../../models/monthly_report_model.dart';

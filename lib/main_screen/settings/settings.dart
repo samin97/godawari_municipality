@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:municpality_app/main_screen/home_screen.dart';
-import 'package:municpality_app/main_screen/settings/change_password.dart';
-import 'package:municpality_app/main_screen/settings/update_device_id.dart';
+import 'package:smart_attendance/main_screen/settings/update_device_id.dart';
 
 import '../../authenticate/login.dart';
 import '../../global/global.dart';
 import '../../global/widgets/app_button.dart';
+import '../home_screen.dart';
+import 'change_password.dart';
 
 
 class SettingsScreen extends StatefulWidget {

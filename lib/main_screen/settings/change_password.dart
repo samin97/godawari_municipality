@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:municpality_app/main_screen/settings/settings.dart';
+import 'package:smart_attendance/main_screen/settings/settings.dart';
 
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
@@ -30,7 +30,7 @@ class _ChangePasswordState extends State<ChangePassword> {
             context: context,
             builder: (c) {
               return const ErrorDialog(
-                message: "The two passwords do not match",
+                message: "पासवर्डहरु मिलेन ।",
               );
             });
       }
@@ -39,7 +39,7 @@ class _ChangePasswordState extends State<ChangePassword> {
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "Please fill both password",
+              message: "कृपया दुबै पासवर्ड भर्नुहोस् ।",
             );
           });
     }
@@ -56,8 +56,8 @@ class _ChangePasswordState extends State<ChangePassword> {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text("तपाईं अफलाइन हुनुहुन्छ।"),
-          content: const Text("तपार्इ अफलार्इन हुनुहुन्छ । तपार्इको इन्टरनेटमा कनेक्सन चेक गर्नुहोस् ।"),
+          title: const Text("तपाईं अफलाइन हुनुहुन्छ ।"),
+          content: const Text("तपाईं अफलाइन हुनुहुन्छ । तपाईंको इन्टरनेटमा कनेक्सन चेक गर्नुहोस् ।"),
           actions: [
             TextButton(
                 onPressed: () {

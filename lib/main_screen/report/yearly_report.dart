@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-import 'package:municpality_app/global/widgets/error_dialog.dart';
-import 'package:municpality_app/main_screen/report/yearly_report_details.dart';
 
 import '../../global/widgets/button_widget.dart';
+import '../../global/widgets/error_dialog.dart';
 
 class ReportYear extends StatefulWidget {
   const ReportYear({Key? key}) : super(key: key);

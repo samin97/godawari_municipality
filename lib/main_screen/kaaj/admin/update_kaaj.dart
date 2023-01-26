@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:municpality_app/main_screen/kaaj/admin/update_kaaj_details.dart';
-import 'package:municpality_app/models/admin_kaaj_model.dart';
+import 'package:smart_attendance/main_screen/kaaj/admin/update_kaaj_details.dart';
 import '../../../global/global.dart';
-import '../../../models/admin_leave_model.dart';
+import '../../../models/admin_kaaj_model.dart';
 import 'package:http/http.dart' as http;
 import '../../home_screen.dart';
 

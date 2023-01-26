@@ -165,9 +165,9 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
       showDialog<String>(
         context: context,
         builder: (BuildContext context) => AlertDialog(
-          title: const Text("तपाईं अफलाइन हुनुहुन्छ ."),
+          title: const Text("तपाईं अफलाइन हुनुहुन्छ ।"),
           content: const Text(
-              "तपाईको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
+              "तपाईंको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
           actions: [
             TextButton(
                 onPressed: () {
@@ -187,7 +187,7 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text(
-              "तपाइको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
+              "तपाईंको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
           content: Text("भेरिफाईकोलागि अनुरोध गर्न याँहा Click गर्नुहोस् ।"),
           actions: [
             TextButton(
@@ -224,11 +224,11 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
         context: context,
         builder: (BuildContext context) => AlertDialog(
           title: Text(
-              "तपार्इ कार्यालयबाट लगभग " + distanceInMeters.toStringAsFixed(2) +
+              "तपाईं कार्यालयबाट लगभग " + distanceInMeters.toStringAsFixed(2) +
                   " मिटर टाढा हुनुहुन्छ."),
           content: Text("तपार्इ कार्यालयबाट " +
               sharedPreferences!.getString("permittedDistance")! +
-              "म िटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
+              "मिटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
           actions: [
             TextButton(
                 onPressed: () {
@@ -454,7 +454,7 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
                                 title:
                                     const Text("के तपाईं पक्का हुनुहुन्छ ? "),
                                 content: const Text(
-                                    "के तपाई कार्यालयबाट बाहिरिदै हो ?"),
+                                    "के तपाईं कार्यालयबाट बाहिरिदै हो ?"),
                                 actions: [
                                   TextButton(
                                       onPressed: () {

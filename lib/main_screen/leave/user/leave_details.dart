@@ -23,7 +23,7 @@ class _UserLeaveDetailsState extends State<UserLeaveDetails> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            '$type Leave Details',
+            '$type बिदा विवरण',
             style: const TextStyle(
               fontSize: 30,
               color: Colors.white,

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:municpality_app/main_screen/kaaj/user/get_approved_kaaj.dart';
-import 'package:municpality_app/main_screen/kaaj/user/get_canceled_kaaj.dart';
-import 'package:municpality_app/main_screen/kaaj/user/request_kaaj.dart';
+import 'package:smart_attendance/main_screen/kaaj/user/request_kaaj.dart';
 import '../../home_screen.dart';
+import 'get_approved_kaaj.dart';
+import 'get_canceled_kaaj.dart';
 
 class Kaaj extends StatefulWidget {
   const Kaaj({Key? key}) : super(key: key);

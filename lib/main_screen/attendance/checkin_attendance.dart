@@ -1,26 +1,19 @@
 import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'dart:io' show Platform;
+import 'dart:io' show NetworkInterface, Platform;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
-import 'package:municpality_app/main_screen/settings/update_device_id.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:http/http.dart' as http;
-import 'package:sms_autofill/sms_autofill.dart';
-import '../../global/components/location_api.dart';
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
-import '../../local_db/db/sqlite_db.dart';
-import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
-import '../../models/local_storage_model.dart';
-import '../../models/location_permission_model.dart';
-import '../../models/offline_attendance_model.dart';
+import '../../models/work_check_time.dart';
 import '../home_screen.dart';
-import 'local_storage/offline_attendance_db.dart';
+import '../settings/update_device_id.dart';
 
 class AttendanceCheckIn extends StatefulWidget {
   const AttendanceCheckIn({Key? key}) : super(key: key);
@@ -31,8 +24,6 @@ class AttendanceCheckIn extends StatefulWidget {
 
 class _AttendanceCheckInState extends State<AttendanceCheckIn> {
   Position? position;
-  late List<OfflineAttendance> offlineAttendance;
-  bool isLoading = false;
   TextEditingController phoneNumberController = TextEditingController();
   late AttendanceModel attendanceModel = AttendanceModel(
       nepaliDate: "nepaliDate",
@@ -51,70 +42,13 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
   var deviceInfo;
   bool hasAttended = false;
   String currentTime = "HH:mm:ss";
+  String checkInTime = "10:00:00";
 
   @override
   void initState() {
     super.initState();
     lastAttendance();
     attendanceDetails();
-    refreshOfflineAttendances();
-  }
-  @override
-  void dispose() {
-    OfflineDB.instance.close();
-    super.dispose();
-  }
-
-  Future refreshOfflineAttendances() async {
-    setState(() {
-      isLoading = true;
-    });
-    this.offlineAttendance = await OfflineDB.instance.readAllAttendance();
-    setState(() {
-      isLoading = false;
-    });
-  }
-
-  Future updateOfflineAttendance() async {
-    final token = sharedPreferences!.getString("token")!;
-    for (int i = 0; i < offlineAttendance.length; i++) {
-      AttendanceModel attendanceModel = AttendanceModel(
-          nepaliDate: offlineAttendance[i].nepaliDate,
-          englishDate: offlineAttendance[i].englishDate,
-          attendDateTime: offlineAttendance[i].time,
-          latitude: offlineAttendance[i].latitude,
-          longitude: offlineAttendance[i].longitude,
-          deviceId: offlineAttendance[i].deviceID,
-          status: offlineAttendance[i].status,
-          mobileNo: offlineAttendance[i].phone);
-      if (offlineAttendance[i].status == 'check-in') {
-        var response = await http.post(
-            Uri.parse(
-                "http://mis.godawarimun.gov.np/Api/Attendence/AttendUser"),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode(attendanceModel));
-        print('offline attendance done');
-        print(response.statusCode);
-        if (response.statusCode == 200) {
-          await OfflineDB.instance.delete(offlineAttendance[i].id as int);
-          print('offline attendance done');
-        }
-      } else {
-        var response = await http.post(
-            Uri.parse("http://mis.godawarimun.gov.np/Api/Attendence/AttendBeforeLeave"),
-            headers: <String, String>{
-              'Content-Type': 'application/json; charset=UTF-8',
-              'Authorization': 'Bearer $token',
-            },
-            body: jsonEncode(attendanceModel));
-        if (response.statusCode == 200) {
-          await OfflineDB.instance.delete(offlineAttendance[i].id as int);
-        }
-      }
-    }
   }
 
   Future<void> lastAttendance() async {
@@ -127,10 +61,9 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
         'Authorization': 'Bearer $token',
       },
     );
-    print(response.body);
     if (response.statusCode == 200) {
       AttendanceModel _lastAttendance =
-      AttendanceModel.fromJson(jsonDecode(response.body));
+          AttendanceModel.fromJson(jsonDecode(response.body));
       if (_lastAttendance.englishDate ==
           DateFormat('yyyy/MM/dd').format(DateTime.now())) {
         setState(() {
@@ -144,7 +77,15 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     } else {
       throw Exception('Failed to load attendance');
     }
-    print(hasAttended);
+  }
+  Future printIps() async {
+    for (var interface in await NetworkInterface.list()) {
+      print('== Interface: ${interface.name} ==');
+      for (var addr in interface.addresses) {
+        print(
+            '${addr.address} ${addr.host} ${addr.isLoopback} ${addr.rawAddress} ${addr.type.name}');
+      }
+    }
   }
 
   Future<void> attendanceDetails() async {
@@ -163,7 +104,6 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     Position newPosition = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high);
     position = newPosition;
-    print(position?.latitude);
     //deviceId:
     final deviceInfoPlugin = DeviceInfoPlugin();
 
@@ -176,6 +116,8 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     //networkId:
     final info = NetworkInfo();
     var wifiGateway = await info.getWifiGatewayIP();
+    print(wifiGateway);
+    printIps();
 
     setState(() {
       attendanceModel.nepaliDate = nepaliFormatted.trim();
@@ -191,91 +133,100 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     });
   }
 
-  checkPhoneNumber() {
-    if (phoneNumberController.text.isNotEmpty) {
-      checkConnection();
+  Future<void> checkTime() async {
+    final token = sharedPreferences!.getString("token")!;
+    final response = await http.get(
+      Uri.parse('http://mis.godawarimun.gov.np/Api/Attendence/GetWorkingHour'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      WorkCheckTime _workCheckTime =
+          WorkCheckTime.fromJson(jsonDecode(response.body));
+      print(currentTime);
+      String defaultDate = "0001-01-01 ";
+      String _currentTime = currentTime;
+      String allowedTime = _workCheckTime.upasthitHunaPauneSamaya;
+      DateTime dt1 = DateTime.parse(defaultDate + _currentTime);
+      DateTime dt2 = DateTime.parse(defaultDate + allowedTime);
+      if ((dt1.compareTo(dt2) < 0)) {
+        checkLocation();
+      } else {
+        showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text("उपस्थित हुन पाउने समय सिमा ।"),
+            content: const Text("माफ गर्नुहोला । तपाई ढिलो आउनुभयो।"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Conform"))
+            ],
+          ),
+        );
+      }
     } else {
-      showDialog<String>(
-        context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: const Text("Phone number is not filled."),
-              content: const Text("Please enter your correct phone number."),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Conform"))
-              ],
-            ),
-      );
+      throw Exception('Failed to load attendance');
     }
   }
 
   Future checkConnection() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      checkLocation();
+      checkTime();
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      checkLocation();
+      checkTime();
     } else {
       showDialog<String>(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: const Text("तपाईं अफलाइन हुनुहुन्छ।"),
-              content: const Text(
-                  "तपाईको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Conform"))
-              ],
-            ),
+        builder: (BuildContext context) => AlertDialog(
+          title: const Text("तपाईं अफलाइन हुनुहुन्छ ।"),
+          content: const Text(
+              "तपाईंको मोबार्इल सेटमा इन्टरनेट जडान भए/नभएको सुनिश्चित गर्नुहोस् ।"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Conform"))
+          ],
+        ),
       );
       //localStorage();
     }
   }
 
-
   Future checkLocation() async {
     if (attendanceModel.deviceId != sharedPreferences!.getString("deviceId")!) {
-
       return showDialog<String>(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: Text(
-                  "तपाइको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
-              content: Text("भेरिफाईकोलागि अनुरोध गर्न याँहा Conform गर्नुहोस् ।"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Route newRoute = MaterialPageRoute(builder: (_) => const UpdateDeviceID());
-                      Navigator.pushReplacement(context, newRoute);
-                    },
-                    child: const Text("Conform"))
-              ],
-            ),
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("तपाईंको मोबाइल सेट भेरिफाई हुन बाँकी छ "),
+          content: Text("भेरिफाईकोलागि अनुरोध गर्न याँहा Click गर्नुहोस् ।"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Route newRoute =
+                      MaterialPageRoute(builder: (_) => const UpdateDeviceID());
+                  Navigator.pushReplacement(context, newRoute);
+                },
+                child: const Text("Conform"))
+          ],
+        ),
       );
-    };
-    print(position?.latitude);
-    print(position?.longitude);
+    }
     double distanceInMeters = Geolocator.distanceBetween(
       position?.latitude as double,
       position?.longitude as double,
       double.parse(sharedPreferences!.getString("latitude")!),
       double.parse(sharedPreferences!.getString("longitude")!),
     );
-    print(double.parse(sharedPreferences!.getString("permittedDistance")!));
-
-    print(distanceInMeters);
     bool dif = distanceInMeters <
         double.parse(sharedPreferences!.getString("permittedDistance")!);
-    print(dif);
     if (distanceInMeters <
         double.parse(sharedPreferences!.getString("permittedDistance")!)) {
       attendanceDetails();
@@ -283,22 +234,21 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     } else {
       showDialog<String>(
         context: context,
-        builder: (BuildContext context) =>
-            AlertDialog(
-              title: Text(
-                  "तपार्इ कार्यालयबाट लगभग " + distanceInMeters.toStringAsFixed(2) +
-                      " मिटर टाढा हुनुहुन्छ."),
-              content: Text("तपार्इ कार्यालयबाट " +
-                  sharedPreferences!.getString("permittedDistance")! +
-                  "म िटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
-              actions: [
-                TextButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text("Conform"))
-              ],
-            ),
+        builder: (BuildContext context) => AlertDialog(
+          title: Text("तपाईं कार्यालयबाट लगभग " +
+              distanceInMeters.toStringAsFixed(2) +
+              " मिटर टाढा हुनुहुन्छ."),
+          content: Text("तपार्इ कार्यालयबाट " +
+              sharedPreferences!.getString("permittedDistance")! +
+              "मिटर भित्रबाट मात्र हाजिर गर्न सक्नहुन्छ ।"),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Conform"))
+          ],
+        ),
       );
     }
   }
@@ -314,24 +264,21 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
         body: jsonEncode(attendanceModel));
 
     if (response.statusCode == 200) {
-      refreshOfflineAttendances();
-      updateOfflineAttendance();
       // var s = response.body.toString();
       Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
       Navigator.pushReplacement(context, newRoute);
     } else {
-      print(response.body);
       showDialog(
           context: context,
           builder: (c) {
             return const ErrorDialog(
-              message: "हाजिर गर्न असमर्थन हुनुभयो । पुनःप्रयास गर्नुहोला ।",
+              message: "Failed to attend",
             );
           });
     }
   }
 
-  final double textSize = 20;
+  final double textSize = 16;
 
   @override
   Widget build(BuildContext context) {
@@ -343,7 +290,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
             Visibility(
                 visible: hasAttended,
                 child: const Center(
-                  child: Text("तपाईको आजको उपस्थिति पेश गरिसक्नुभएको छ ।"),
+                  child: Text("You have already check in"),
                 )),
             Visibility(
               visible: !hasAttended,
@@ -461,49 +408,31 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
                               style: TextStyle(fontSize: textSize))),
                     ],
                   ),
-                  // Row(
-                  //   children: [
-                  //     Expanded(
-                  //         flex: 1,
-                  //         child: Text("Phone Number",
-                  //             style: TextStyle(fontSize: textSize))),
-                  //     Expanded(
-                  //       flex: 1,
-                  //       child: PhoneFieldHint(
-                  //         controller: phoneNumberController,
-                  //       ),
-                  //     ),
-                  //   ],
-                  // ),
                   const SizedBox(
                     height: 20,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      // ElevatedButton(
-                      //     onPressed: () {
-                      //       attendanceDetails();
-                      //     },
-                      //     child: const Text("Update Information")),
                       ElevatedButton(
                           onPressed: () {
                             showDialog<String>(
                               context: context,
-                              builder: (BuildContext context) =>
-                                  AlertDialog(
-                                    title: const Text("के तपाईं पक्का हुनुहुन्छ ?"),
-                                    content: const Text(
-                                        "हाजिरि गर्दाखेरीः  दिनमा एकपटकमात्र तपाई आफ्नो हाजिरी गर्न सक्नुहुन्छ ।"),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () {
-                                            Navigator.pop(context);
-                                            checkConnection();
-                                          },
-                                          child: const Text("Conform"))
-                                    ],
-                                  ),
+                              builder: (BuildContext context) => AlertDialog(
+                                title:
+                                    const Text("के तपाईं पक्का हुनुहुन्छ ? "),
+                                content: const Text(
+                                    "दिनमा एकपटकमात्र तपाई आफ्नो हाजिरी गर्न सक्नुहुन्छ ।"),
+                                actions: [
+                                  TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(context);
+                                        attendanceDetails();
+                                        checkConnection();
+                                      },
+                                      child: const Text("Conform"))
+                                ],
+                              ),
                             );
                           },
                           child: const Text("हाजिर गर्नुहोस्")),

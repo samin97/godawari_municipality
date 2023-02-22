@@ -292,11 +292,11 @@ class _LoginState extends State<Login> {
                   const Divider(
                     thickness: 4,
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                        offlineLogin();
-                      },
-                      child: const Text("Offline login")),
+                  // ElevatedButton(
+                  //     onPressed: () {
+                  //       offlineLogin();
+                  //     },
+                  //     child: const Text("Offline login")),
                 ],
               ),
             ],

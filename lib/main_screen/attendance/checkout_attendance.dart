@@ -17,6 +17,7 @@ import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
 import '../../models/location_permission_model.dart';
+import '../../models/work_check_time.dart';
 import '../home_screen.dart';
 import '../settings/update_device_id.dart';
 
@@ -152,6 +153,47 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
           ],
         ),
       );
+    }
+  }
+
+  Future<void> checkTime() async {
+    final token = sharedPreferences!.getString("token")!;
+    final response = await http.get(
+      Uri.parse('http://mis.godawarimun.gov.np/Api/Attendence/GetWorkingHour'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    if (response.statusCode == 200) {
+      WorkCheckTime _workCheckTime =
+      WorkCheckTime.fromJson(jsonDecode(response.body));
+      print(currentTime);
+      String defaultDate = "0001-01-01 ";
+      String _currentTime = currentTime;
+      String allowedTime = _workCheckTime.upasthitHunaPauneSamayaSimaAaanyaDin;
+      DateTime dt1 = DateTime.parse(defaultDate + _currentTime);
+      DateTime dt2 = DateTime.parse(defaultDate + allowedTime);
+      if ((dt1.compareTo(dt2) > 0)) {
+        checkLocation();
+      } else {
+        showDialog<String>(
+          context: context,
+          builder: (BuildContext context) => AlertDialog(
+            title: const Text("उपस्थित हुन पाउने समय सिमा ।"),
+            content: const Text("माफ गर्नुहोला । तपाई ढिलो आउनुभयो।"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Conform"))
+            ],
+          ),
+        );
+      }
+    } else {
+      throw Exception('Failed to load attendance');
     }
   }
 

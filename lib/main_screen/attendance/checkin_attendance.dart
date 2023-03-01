@@ -142,6 +142,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
         'Authorization': 'Bearer $token',
       },
     );
+    print(response.body);
     if (response.statusCode == 200) {
       WorkCheckTime _workCheckTime =
           WorkCheckTime.fromJson(jsonDecode(response.body));

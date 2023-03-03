@@ -1,4 +1,4 @@
-package com.example.first_app
+package com.DEBUGSOFT.godawari_app
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.android.FlutterFragmentActivity

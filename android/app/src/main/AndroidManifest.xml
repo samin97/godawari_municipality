@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.first_app">
+    package="com.DEBUGSOFT.godawari_app">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.USE_FINGERPRINT"/>
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -7,7 +7,7 @@
 
 
     <application
-        android:label="Godawari Municpality App"
+        android:label="Smart Attendance"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:new_version_plus/new_version_plus.dart';
 import '../global/widgets/error_dialog.dart';
 import '../global/global.dart';
 import '../main_screen/attendance/offline_home.dart';
@@ -19,6 +20,54 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   TextEditingController usernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    final newVersion = NewVersionPlus(
+      iOSId: 'com.google.Vespa',
+      androidId: 'com.DEBUGSOFT.godawari_app',
+    );
+    const simpleBehavior = false;
+
+    if (simpleBehavior) {
+      //basicStatusCheck(newVersion);
+    } else {
+      advancedStatusCheck(newVersion);
+    }
+  }
+
+  //
+  // basicStatusCheck(NewVersionPlus newVersion) async {
+  //   final version = await newVersion.getVersionStatus();
+  //   if (version != null) {
+  //     release = version.releaseNotes ?? "";
+  //     setState(() {});
+  //   }
+  //   newVersion.showAlertIfNecessary(
+  //     context: context,
+  //     launchModeVersion: LaunchModeVersion.external,
+  //   );
+  // }
+
+  advancedStatusCheck(NewVersionPlus newVersion) async {
+    final status = await newVersion.getVersionStatus();
+    if (status != null) {
+      debugPrint(status.releaseNotes);
+      debugPrint(status.appStoreLink);
+      debugPrint(status.localVersion);
+      debugPrint(status.storeVersion);
+      debugPrint(status.canUpdate.toString());
+      if(status.canUpdate){
+        newVersion.showUpdateDialog(
+          context: context,
+          versionStatus: status,
+          dialogTitle: 'New version available',
+          dialogText: 'Please update application',
+        );
+      }
+    }
+  }
 
   offlineLogin() {
     if (usernameController.text.isNotEmpty &&
@@ -183,8 +232,7 @@ class _LoginState extends State<Login> {
       print(userDetails.meters);
       await sharedPreferences?.setString(
           "token", userDetails.tokenString as String);
-      await sharedPreferences?.setString(
-          "username", userDetails.username!);
+      await sharedPreferences?.setString("username", userDetails.username!);
       await sharedPreferences?.setString(
           "firstName", userDetails.firstName ?? "First Name");
       await sharedPreferences?.setString(
@@ -193,7 +241,8 @@ class _LoginState extends State<Login> {
           "latitude", userDetails.latitude ?? "latitude");
       await sharedPreferences?.setString(
           "longitude", userDetails.longitude ?? "longitude");
-      await sharedPreferences?.setString("deviceId", userDetails.deviceId ?? 'deviceID');
+      await sharedPreferences?.setString(
+          "deviceId", userDetails.deviceId ?? 'deviceID');
       await sharedPreferences?.setString(
           "permittedDistance", userDetails.meters ?? "meters");
       await sharedPreferences?.setString("role", userDetails.role ?? "role");
@@ -306,14 +355,3 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
-

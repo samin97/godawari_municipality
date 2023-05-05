@@ -26,11 +26,11 @@ class _AllLeaveState extends State<AllLeave> {
     if (response.statusCode == 200) {
       List<dynamic> parsed =
           json.decode(response.body).cast<Map<String, dynamic>>();
-      //print(parsed);
+      print(parsed);
       List<LeaveModel> list = [];
-      //print(list);
+      print(list);
       list = parsed.map((json) => LeaveModel.fromJson(json)).toList();
-      //print(list);
+      print(list);
       return list;
     } else {
       throw Exception('Failed to load leave log');

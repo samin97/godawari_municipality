@@ -3,12 +3,12 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:new_version_plus/new_version_plus.dart';
-import '../global/widgets/error_dialog.dart';
-import '../global/global.dart';
-import '../main_screen/attendance/offline_home.dart';
-import '../main_screen/home_screen.dart';
-import '../models/login_model.dart';
-import '../models/login_response_model.dart';
+import '../../global/widgets/error_dialog.dart';
+import '../../global/global.dart';
+import '../attendance/offline_home.dart';
+import '../employee_home_screen.dart';
+import '../../models/login_model.dart';
+import '../../models/login_response_model.dart';
 
 class Login extends StatefulWidget {
   const Login({Key? key}) : super(key: key);
@@ -28,13 +28,8 @@ class _LoginState extends State<Login> {
       iOSId: 'com.DEBUGSOFT.godawari_app',
       androidId: 'com.DEBUGSOFT.godawari_app',
     );
-    const simpleBehavior = false;
+    advancedStatusCheck(newVersion);
 
-    if (simpleBehavior) {
-      //basicStatusCheck(newVersion);
-    } else {
-      advancedStatusCheck(newVersion);
-    }
   }
 
   //
@@ -284,13 +279,8 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Scaffold(
-        appBar: AppBar(
-          centerTitle: true,
-          title: const Text("Login"),
-          automaticallyImplyLeading: false,
-        ),
-        body: SingleChildScrollView(
+      child: Container(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.all(30),
           child: Column(
             children: [

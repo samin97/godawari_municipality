@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../global/global.dart';
 import '../../../models/admin_leave_model.dart';
 import 'package:http/http.dart' as http;
-import '../../home_screen.dart';
+import '../../employee_home_screen.dart';
 import 'leave_status_details.dart';
 
 class LeaveStatus extends StatefulWidget {

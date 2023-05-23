@@ -6,7 +6,7 @@ import 'package:smart_attendance/main_screen/settings/settings.dart';
 import 'dart:io' show Platform;
 import '../../global/global.dart';
 import '../../models/device_id_response.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 
 class UpdateDeviceID extends StatefulWidget {
   const UpdateDeviceID({Key? key}) : super(key: key);

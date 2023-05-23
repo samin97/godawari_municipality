@@ -4,7 +4,7 @@ import 'package:smart_attendance/main_screen/kaaj/admin/update_kaaj_details.dart
 import '../../../global/global.dart';
 import '../../../models/admin_kaaj_model.dart';
 import 'package:http/http.dart' as http;
-import '../../home_screen.dart';
+import '../../employee_home_screen.dart';
 
 class UpdateKaaj extends StatefulWidget {
   const UpdateKaaj({Key? key}) : super(key: key);

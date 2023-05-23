@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:smart_attendance/main_screen/public_home/public_home_screen.dart';
 import 'package:smart_attendance/main_screen/settings/update_device_id.dart';
 
-import '../../authenticate/login.dart';
 import '../../global/global.dart';
 import '../../global/widgets/app_button.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 import 'change_password.dart';
 
 
@@ -18,7 +18,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   Future logoutNow() async {
     await sharedPreferences?.remove("email");
-    Route newRoute = MaterialPageRoute(builder: (_) => const Login());
+    Route newRoute = MaterialPageRoute(builder: (_) => const PublicHomeScreen());
     Navigator.pushReplacement(context, newRoute);
   }
   Future<bool> _onWillPop() async{

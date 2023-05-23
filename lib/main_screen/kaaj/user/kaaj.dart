@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_attendance/main_screen/kaaj/user/request_kaaj.dart';
-import '../../home_screen.dart';
+import '../../employee_home_screen.dart';
 import 'get_approved_kaaj.dart';
 import 'get_canceled_kaaj.dart';
 

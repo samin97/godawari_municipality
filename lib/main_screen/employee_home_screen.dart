@@ -12,7 +12,7 @@ import 'package:smart_attendance/main_screen/report/report_category.dart';
 import 'package:smart_attendance/main_screen/settings/settings.dart';
 import 'package:smart_attendance/main_screen/settings/update_device_id.dart';
 import 'package:smart_attendance/main_screen/test_dummy.dart';
-import '../authenticate/login.dart';
+import 'public_home/employee_login.dart';
 import '../global/widgets/app_button.dart';
 import '../global/widgets/error_dialog.dart';
 import '../global/global.dart';

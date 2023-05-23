@@ -1,27 +1,18 @@
-import 'dart:convert';
+
 import 'dart:io' show Platform;
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import 'package:nepali_utils/nepali_utils.dart';
-import 'package:local_auth/local_auth.dart';
 import 'package:network_info_plus/network_info_plus.dart';
-import 'package:http/http.dart' as http;
-import 'package:sms_autofill/sms_autofill.dart';
 
-import '../../authenticate/login.dart';
+import '../public_home/employee_login.dart';
 import '../../global/global.dart';
 import '../../global/widgets/app_button.dart';
 import '../../global/widgets/error_dialog.dart';
-import '../../local_db/db/sqlite_db.dart';
-import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
-import '../../models/local_storage_model.dart';
 import '../../models/offline_attendance_model.dart';
-import '../home_screen.dart';
-import '../settings/settings.dart';
 import 'local_storage/offline_attendance_db.dart';
 
 class OfflineHome extends StatefulWidget {

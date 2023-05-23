@@ -6,7 +6,7 @@ import '../../global/global.dart';
 import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 import 'fetch_attendance.dart';
 
 class SyncAttendance extends StatefulWidget {

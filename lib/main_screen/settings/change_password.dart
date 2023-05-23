@@ -7,7 +7,7 @@ import 'package:smart_attendance/main_screen/settings/settings.dart';
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
 import '../../models/login_model.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 
 class ChangePassword extends StatefulWidget {
   const ChangePassword({Key? key}) : super(key: key);

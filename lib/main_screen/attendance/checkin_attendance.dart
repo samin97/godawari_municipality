@@ -12,7 +12,7 @@ import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
 import '../../models/attendance_model.dart';
 import '../../models/work_check_time.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 import '../settings/update_device_id.dart';
 
 class AttendanceCheckIn extends StatefulWidget {
@@ -226,8 +226,6 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
       double.parse(sharedPreferences!.getString("latitude")!),
       double.parse(sharedPreferences!.getString("longitude")!),
     );
-    bool dif = distanceInMeters <
-        double.parse(sharedPreferences!.getString("permittedDistance")!);
     if (distanceInMeters <
         double.parse(sharedPreferences!.getString("permittedDistance")!)) {
       attendanceDetails();

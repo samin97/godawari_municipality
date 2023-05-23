@@ -8,17 +8,14 @@ import 'package:intl/intl.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:http/http.dart' as http;
-import 'package:sms_autofill/sms_autofill.dart';
-import '../../global/components/location_api.dart';
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
 import '../../local_db/db/sqlite_db.dart';
 import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
-import '../../models/location_permission_model.dart';
 import '../../models/work_check_time.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 import '../settings/update_device_id.dart';
 
 class AttendanceCheckOut extends StatefulWidget {

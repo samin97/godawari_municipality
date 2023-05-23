@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import '../../global/global.dart';
 import '../../models/event_model.dart';
-import '../home_screen.dart';
+import '../employee_home_screen.dart';
 import 'event_details.dart';
 
 class EventListScreen extends StatefulWidget {

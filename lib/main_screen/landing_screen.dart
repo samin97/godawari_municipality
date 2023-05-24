@@ -51,8 +51,8 @@ class _LandingScreenState extends State<LandingScreen> {
                     },
                     child: Card(
                       child: Container(
-                        height: h1,
-                        width: w1,
+                        height: MediaQuery.of(context).size.width*.38,
+                        width: MediaQuery.of(context).size.width*.38,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
@@ -82,8 +82,8 @@ class _LandingScreenState extends State<LandingScreen> {
                     },
                     child: Card(
                       child: Container(
-                        height: h1,
-                        width: w1,
+                        height: MediaQuery.of(context).size.width*.38,
+                        width: MediaQuery.of(context).size.width*.38,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
@@ -116,8 +116,8 @@ class _LandingScreenState extends State<LandingScreen> {
                     },
                     child: Card(
                       child: Container(
-                        height: h1,
-                        width: w1,
+                        height: MediaQuery.of(context).size.width*.38,
+                        width: MediaQuery.of(context).size.width*.38,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
@@ -147,8 +147,8 @@ class _LandingScreenState extends State<LandingScreen> {
                     },
                     child: Card(
                       child: Container(
-                        height: h1,
-                        width: w1,
+                        height: MediaQuery.of(context).size.width*.38,
+                        width: MediaQuery.of(context).size.width*.38,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(
@@ -183,8 +183,8 @@ class _LandingScreenState extends State<LandingScreen> {
                     },
                     child: Card(
                       child: Container(
-                        height: h1,
-                        width: w1,
+                        height: MediaQuery.of(context).size.width*.38,
+                        width: MediaQuery.of(context).size.width*.38,
                         child: Padding(
                           padding: const EdgeInsets.all(10.0),
                           child: Column(

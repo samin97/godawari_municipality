@@ -361,7 +361,7 @@
 				DEVELOPMENT_TEAM = GK67X6LT6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Smart Attendance System (SAS)";
+				INFOPLIST_KEY_CFBundleDisplayName = "Digital Godawari";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -494,7 +494,7 @@
 				DEVELOPMENT_TEAM = GK67X6LT6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Smart Attendance System (SAS)";
+				INFOPLIST_KEY_CFBundleDisplayName = "Digital Godawari";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -521,7 +521,7 @@
 				DEVELOPMENT_TEAM = GK67X6LT6V;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Smart Attendance System (SAS)";
+				INFOPLIST_KEY_CFBundleDisplayName = "Digital Godawari";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

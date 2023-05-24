@@ -36,67 +36,88 @@ class _PublicEventsState extends State<PublicEvents> {
   }
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<PublicEventModel>>(
-      future: approvedLeave(),
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        }
-        if (snapshot.hasData) {
-          List<PublicEventModel> eventList = snapshot.data;
-          return ListView.builder(
-              itemCount: snapshot.data.length,
-              itemBuilder: (context, index) {
-                return Card(
-                  margin: const EdgeInsets.all(8.0),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: InkWell(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          FadeInImage.assetNetwork(
-                            placeholder: 'images/noImage.jpg',
-                            image: 'http://mis.godawarimun.gov.np/uploads/' + eventList[index].photo.toString(), width: 50,
-                            height: 50,
-                          ),
-
-                          SizedBox(width: 10,),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                  "Name:" + eventList[index].name.toString()),
-                              Text(
-                                  eventList[index].shortDescription.toString())
-                            ],
-                          ),
-                        ],
-                      ),
-                      onTap: () {
-                        Route newRoute = MaterialPageRoute(
-                            builder: (_) => PublicEventDetails(
-                              eventModel: eventList[index],
-
-                            ));
-                        Navigator.pushReplacement(context, newRoute);
-                      },
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Text(
+              'Our public events',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: FutureBuilder<List<PublicEventModel>>(
+        future: approvedLeave(),
+        builder: (context, AsyncSnapshot snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          if (snapshot.hasData) {
+            List<PublicEventModel> eventList = snapshot.data;
+            return ListView.builder(
+                itemCount: snapshot.data.length,
+                itemBuilder: (context, index) {
+                  return Card(
+                    margin: const EdgeInsets.all(8.0),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10.0),
                     ),
-                  ),
-                );
-              });
-        } else {
-          return const Center(
-            child: Text("There are no current public event."),
-          );
-        }
-      },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: InkWell(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            FadeInImage.assetNetwork(
+                              placeholder: 'images/noImage.jpg',
+                              image: 'http://mis.godawarimun.gov.np/uploads/' + eventList[index].photo.toString(), width: 50,
+                              height: 50,
+                            ),
+
+                            SizedBox(width: 10,),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                    "Title : " + eventList[index].name.toString()),
+                                Text(
+                                    "Date : " + eventList[index].name.toString()),
+                                Text(
+                                    "Details : " + eventList[index].shortDescription.toString()),
+
+                              ],
+                            ),
+                          ],
+                        ),
+                        onTap: () {
+                          Route newRoute = MaterialPageRoute(
+                              builder: (_) => PublicEventDetails(
+                                eventModel: eventList[index],
+
+                              ));
+                          Navigator.pushReplacement(context, newRoute);
+                        },
+                      ),
+                    ),
+                  );
+                });
+          } else {
+            return const Center(
+              child: Text("There are no current public event."),
+            );
+          }
+        },
+      ),
     );
   }
 }

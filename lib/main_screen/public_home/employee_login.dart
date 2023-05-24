@@ -279,8 +279,24 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
-      child: Container(
-        child: SingleChildScrollView(
+      child: Scaffold(
+        appBar: AppBar(
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Log in',
+                style: TextStyle(
+                  fontSize: 30,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
+          centerTitle: true,
+          automaticallyImplyLeading: false,
+        ),
+        body: SingleChildScrollView(
           padding: const EdgeInsets.all(30),
           child: Column(
             children: [
@@ -328,9 +344,7 @@ class _LoginState extends State<Login> {
                         formValidation();
                       },
                       child: const Text("Log In")),
-                  const Divider(
-                    thickness: 4,
-                  ),
+
                   // ElevatedButton(
                   //     onPressed: () {
                   //       offlineLogin();

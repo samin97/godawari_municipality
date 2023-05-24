@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_attendance/main_screen/public_home/about_app.dart';
+import 'package:smart_attendance/main_screen/public_home/citizen_chart.dart';
 import 'package:smart_attendance/main_screen/public_home/complain_registration.dart';
 import 'package:smart_attendance/main_screen/public_home/employee_login.dart';
 import 'package:smart_attendance/main_screen/public_home/public_events.dart';
@@ -16,6 +17,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
   static final List<Widget> _widgetOptions = <Widget>[
     PublicEvents(),
     ComplainRegistration(),
+    CitizenChart(),
     Login(),
     AboutApp(),
   ];
@@ -50,22 +52,7 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
         return false;
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Welcome',
-                style: TextStyle(
-                  fontSize: 30,
-                  color: Colors.white,
-                ),
-              ),
-            ],
-          ),
-          centerTitle: true,
-          automaticallyImplyLeading: false,
-        ),
+
         body: Center(
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
@@ -81,6 +68,10 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
               BottomNavigationBarItem(
                   icon: Icon(Icons.question_answer),
                   label: 'गुनासो दर्ता',
+                  backgroundColor: Colors.blueAccent),
+              BottomNavigationBarItem(
+                  icon: Icon(Icons.home_repair_service),
+                  label: 'नगरिक वदा पर्त',
                   backgroundColor: Colors.blueAccent),
               BottomNavigationBarItem(
                   icon: Icon(Icons.login),

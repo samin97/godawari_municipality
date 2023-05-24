@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../landing_screen.dart';
+
 class AboutApp extends StatefulWidget {
   const AboutApp({Key? key}) : super(key: key);
 
@@ -10,9 +12,35 @@ class AboutApp extends StatefulWidget {
 class _AboutAppState extends State<AboutApp> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Center(
-        child: Padding(
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Text(
+              'About App',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 10,)
+          ],
+        ),
+
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Route newRoute =
+            MaterialPageRoute(builder: (_) => const LandingScreen());
+            Navigator.pushReplacement(context, newRoute);
+          },
+        ),
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        Padding(
           padding: const EdgeInsets.all(20.0),
           child: Text(
             "This is an initiation for the digital service in the Municipality. This is designed for official and public use. "
@@ -21,7 +49,7 @@ class _AboutAppState extends State<AboutApp> {
             textAlign: TextAlign.justify,
           ),
         ),
-      ),
+      ]),
     );
   }
 }

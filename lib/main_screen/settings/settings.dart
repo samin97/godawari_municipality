@@ -18,7 +18,9 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   Future logoutNow() async {
     await sharedPreferences?.remove("email");
-    Route newRoute = MaterialPageRoute(builder: (_) => const PublicHomeScreen());
+    Route newRoute = MaterialPageRoute(builder: (_) => const PublicHomeScreen(
+      pageIndex: 4,
+    ));
     Navigator.pushReplacement(context, newRoute);
   }
   Future<bool> _onWillPop() async{

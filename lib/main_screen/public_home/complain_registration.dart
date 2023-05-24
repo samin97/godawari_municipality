@@ -7,6 +7,7 @@ import 'package:http/http.dart' as http;
 import 'package:smart_attendance/models/complain_model.dart';
 
 import '../../global/widgets/error_dialog.dart';
+import '../landing_screen.dart';
 
 class ComplainRegistration extends StatefulWidget {
   const ComplainRegistration({Key? key}) : super(key: key);
@@ -25,7 +26,6 @@ class _ComplainRegistrationState extends State<ComplainRegistration> {
   formValidation() {
     if (senderNameController.text.isNotEmpty &&
         phoneController.text.isNotEmpty &&
-        emailController.text.isNotEmpty &&
         topicController.text.isNotEmpty &&
         detailsController.text.isNotEmpty) {
       checkConnection();
@@ -137,82 +137,119 @@ class _ComplainRegistrationState extends State<ComplainRegistration> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                hintText: 'Your name'),
-            controller: senderNameController,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                hintText: 'Email'),
-            controller: emailController,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                hintText: 'Phone number'),
-            controller: phoneController,
-          ),
-          const SizedBox(
-            height: 20,
-          ),
-          TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                hintText: 'Gunaso ko bisaya'),
-            controller: topicController,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          TextField(
-            decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                ),
-                hintText: 'Gunaso ko bibaran'),
-            controller: detailsController,
-          ),
-          const SizedBox(
-            height: 10,
-          ),
-          ElevatedButton(
-              onPressed: () {
-                const snackBar = SnackBar(
-                  content: Text('Sending complain'),
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                formValidation();
-              },
-              child: const Text("Send")),
+    return Scaffold(
+      appBar: AppBar(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            const Text(
+              'Grievance registration',
+              style: TextStyle(
+                fontSize: 30,
+                color: Colors.white,
+              ),
+            ),
+            SizedBox(width: 10,)
+          ],
+        ),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () {
+            Route newRoute =
+            MaterialPageRoute(builder: (_) => const LandingScreen());
+            Navigator.pushReplacement(context, newRoute);
+          },
+        ),
 
-          // ElevatedButton(
-          //     onPressed: () {
-          //       offlineLogin();
-          //     },
-          //     child: const Text("Offline login")),
-        ],
+        centerTitle: true,
+        automaticallyImplyLeading: false,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                "Any personal information that could identify you will be removed or changed before files are shared with other researchers or results are made public. Your information is take to contact you if necessary. Please feel free to submit your grievance in the form below.",
+                textAlign: TextAlign.justify,
+              ),
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  hintText: 'Your name'),
+              controller: senderNameController,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  hintText: 'Email'),
+              controller: emailController,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  hintText: 'Phone number'),
+              controller: phoneController,
+            ),
+            const SizedBox(
+              height: 20,
+            ),
+            TextField(
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  hintText: 'Gunaso ko bisaya'),
+              controller: topicController,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            TextField(
+              keyboardType: TextInputType.multiline,
+              maxLines: 4,
+              decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  hintText: 'Gunaso ko bibaran'),
+              controller: detailsController,
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  const snackBar = SnackBar(
+                    content: Text('Sending complain'),
+                  );
+                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  formValidation();
+                },
+                child: const Text("Send")),
+
+            // ElevatedButton(
+            //     onPressed: () {
+            //       offlineLogin();
+            //     },
+            //     child: const Text("Offline login")),
+          ],
+        ),
       ),
     );
   }

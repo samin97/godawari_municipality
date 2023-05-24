@@ -5,6 +5,7 @@ import 'package:month_year_picker/month_year_picker.dart';
 import 'package:smart_attendance/main_screen/public_home/public_home_screen.dart';
 
 import 'global/global.dart';
+import 'main_screen/landing_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const PublicHomeScreen(),
+      home: const LandingScreen(),
       localizationsDelegates: const [
         GlobalWidgetsLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,

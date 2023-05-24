@@ -1,26 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:smart_attendance/main_screen/public_home/public_home_screen.dart';
-import 'package:smart_attendance/models/public_event_model.dart';
+import 'package:smart_attendance/models/citizen_chart_model.dart';
 
-class PublicEventDetails extends StatefulWidget {
-  final PublicEventModel eventModel;
+class CitizenChartDetails extends StatefulWidget {
+  final CitizenChartModel model;
 
-  const PublicEventDetails({
-    Key? key,
-    required this.eventModel,
-  }) : super(key: key);
+  const CitizenChartDetails({Key? key, required this.model}) : super(key: key);
 
   @override
-  State<PublicEventDetails> createState() => _PublicEventDetailsState();
+  State<CitizenChartDetails> createState() => _CitizenChartDetailsState();
 }
 
-class _PublicEventDetailsState extends State<PublicEventDetails> {
+class _CitizenChartDetailsState extends State<CitizenChartDetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            'Event Details',
+            'Citizen chart details',
             style: const TextStyle(
               fontSize: 30,
               color: Colors.white,
@@ -33,7 +30,7 @@ class _PublicEventDetailsState extends State<PublicEventDetails> {
             onPressed: () {
               Route newRoute = MaterialPageRoute(
                   builder: (_) => const PublicHomeScreen(
-                        pageIndex: 0,
+                        pageIndex: 2,
                       ));
               Navigator.pushReplacement(context, newRoute);
             },
@@ -46,17 +43,8 @@ class _PublicEventDetailsState extends State<PublicEventDetails> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: FadeInImage.assetNetwork(
-                    placeholder: 'images/noImage.jpg',
-                    image: 'http://mis.godawarimun.gov.np/uploads/' +
-                        widget.eventModel.photo.toString(),
-                  ),
-                ),
-                const SizedBox(height: 10),
                 Text(
-                  "Event : " + widget.eventModel.name.toString(),
+                  "शाखा/उप-शाखाको नाम  : " + widget.model.sakhaName.toString(),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -64,7 +52,7 @@ class _PublicEventDetailsState extends State<PublicEventDetails> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Start date : " + widget.eventModel.startDate.toString(),
+                  "सेवाको किसिम : " + widget.model.sewaKisim.toString(),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -72,7 +60,7 @@ class _PublicEventDetailsState extends State<PublicEventDetails> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "End date : " + widget.eventModel.endDate.toString(),
+                  "शुल्क रू : NRs." + widget.model.sewaSulkhaRs.toString(),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -80,8 +68,40 @@ class _PublicEventDetailsState extends State<PublicEventDetails> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "Description : " +
-                      widget.eventModel.longDescription.toString(),
+                  "लाग्ने समय : " + widget.model.lagneSamaya.toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "जिम्मेवारी अधिकारी : " +
+                      widget.model.jimbebarAdhakari.toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "गुनासो सुन्ने अधिकारी: " + widget.model.gunashoKoAdhakari.toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "आवसेक कागजात तथा प्रकृया  : " + widget.model.awasekKagajat.toString(),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    color: Colors.black,
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  "कैफियत : " + widget.model.remarks.toString() ?? "",
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,

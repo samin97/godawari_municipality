@@ -33,7 +33,7 @@
 	<key>NSFaceIDUsageDescription</key>
 	<string>Why is my app authenticating using face id?</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>This app needs access to location when in the background.</string>
+	<string>This app needs access to location inorder to verify your location for document validation such as attendance, kaaj, etc.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>This app needs access to location when open inorder to check whether you are in the designated location.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -61,3 +61,6 @@
 	<false/>
 </dict>
 </plist>
+
+
+

@@ -48,9 +48,9 @@ class _PublicHomeScreenState extends State<PublicHomeScreen> {
           child: _widgetOptions.elementAt(_selectedIndex),
         ),
         bottomNavigationBar: SizedBox(
-          height: MediaQuery.of(context).size.height / 9.4,
+          height: MediaQuery.of(context).size.height / 8.4,
           child: BottomNavigationBar(
-            iconSize: 34,
+            iconSize: 32,
             items: const <BottomNavigationBarItem>[
               BottomNavigationBarItem(
                   icon: Icon(Icons.event),

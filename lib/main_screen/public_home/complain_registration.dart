@@ -145,7 +145,7 @@ class _ComplainRegistrationState extends State<ComplainRegistration> {
             const Text(
               'Grievance registration',
               style: TextStyle(
-                fontSize: 30,
+                fontSize: 20,
                 color: Colors.white,
               ),
             ),
@@ -166,89 +166,91 @@ class _ComplainRegistrationState extends State<ComplainRegistration> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(12.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "Any personal information that could identify you will be removed or changed before files are shared with other researchers or results are made public. Your information is take to contact you if necessary. Please feel free to submit your grievance in the form below.",
-                textAlign: TextAlign.justify,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "Any personal information that could identify you will be removed or changed before files are shared with other researchers or results are made public. Your information is take to contact you if necessary. Please feel free to submit your grievance in the form below.",
+                  textAlign: TextAlign.justify,
+                ),
               ),
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  hintText: 'Your name'),
-              controller: senderNameController,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  hintText: 'Email'),
-              controller: emailController,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  hintText: 'Phone number'),
-              controller: phoneController,
-            ),
-            const SizedBox(
-              height: 20,
-            ),
-            TextField(
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  hintText: 'Gunaso ko bisaya'),
-              controller: topicController,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            TextField(
-              keyboardType: TextInputType.multiline,
-              maxLines: 4,
-              decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  hintText: 'Gunaso ko bibaran'),
-              controller: detailsController,
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  const snackBar = SnackBar(
-                    content: Text('Sending complain'),
-                  );
-                  ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  formValidation();
-                },
-                child: const Text("Send")),
+              TextField(
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Your name'),
+                controller: senderNameController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Email'),
+                controller: emailController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Phone number'),
+                controller: phoneController,
+              ),
+              const SizedBox(
+                height: 20,
+              ),
+              TextField(
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Gunaso ko bisaya'),
+                controller: topicController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              TextField(
+                keyboardType: TextInputType.multiline,
+                maxLines: 4,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    ),
+                    hintText: 'Gunaso ko bibaran'),
+                controller: detailsController,
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              ElevatedButton(
+                  onPressed: () {
+                    const snackBar = SnackBar(
+                      content: Text('Sending complain'),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    formValidation();
+                  },
+                  child: const Text("Send")),
 
-            // ElevatedButton(
-            //     onPressed: () {
-            //       offlineLogin();
-            //     },
-            //     child: const Text("Offline login")),
-          ],
+              // ElevatedButton(
+              //     onPressed: () {
+              //       offlineLogin();
+              //     },
+              //     child: const Text("Offline login")),
+            ],
+          ),
         ),
       ),
     );

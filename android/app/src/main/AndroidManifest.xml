@@ -7,7 +7,7 @@
 
 
     <application
-        android:label="Smart Attendance System (SAS)"
+        android:label="Smart Godawari"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

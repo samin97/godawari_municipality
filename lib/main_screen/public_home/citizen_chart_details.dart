@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:smart_attendance/main_screen/public_home/public_home_screen.dart';
+import 'package:smart_attendance/main_screen/test_dummy.dart';
 import 'package:smart_attendance/models/citizen_chart_model.dart';
 
 class CitizenChartDetails extends StatefulWidget {
@@ -12,6 +13,13 @@ class CitizenChartDetails extends StatefulWidget {
 }
 
 class _CitizenChartDetailsState extends State<CitizenChartDetails> {
+  @override
+  void initState() {
+    // TODO: implement initState
+    print(widget.model.remarks);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +93,8 @@ class _CitizenChartDetailsState extends State<CitizenChartDetails> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "गुनासो सुन्ने अधिकारी: " + widget.model.gunashoKoAdhakari.toString(),
+                  "गुनासो सुन्ने अधिकारी: " +
+                      widget.model.gunashoKoAdhakari.toString(),
                   style: const TextStyle(
                     fontSize: 18,
                     color: Colors.black,
@@ -93,21 +102,31 @@ class _CitizenChartDetailsState extends State<CitizenChartDetails> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  "आवसेक कागजात तथा प्रकृया  : " + widget.model.awasekKagajat.toString(),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
+                    "आवश्यक कागजात तथा प्रकृया  : " +
+                        (widget.model.awasekKagajat ?? "nothing").toString(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    )),
+                const SizedBox(height: 10),
+                Visibility(
+                  visible: !(widget.model.remarks == null),
+                  child: Text(
+                    "कैफियत : " + widget.model.remarks.toString(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.black,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 10),
-                Text(
-                  "कैफियत : " + widget.model.remarks.toString() ?? "",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 10),
+                ElevatedButton(
+                    onPressed: () {
+                      Route newRoute =
+                          MaterialPageRoute(builder: (_) => const Tester());
+                      Navigator.pushReplacement(context, newRoute);
+                    },
+                    child: Text("click"))
               ],
             ),
           ),

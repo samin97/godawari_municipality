@@ -43,7 +43,7 @@ class _LoginState extends State<Login> {
   void initState() {
     super.initState();
     final newVersion = NewVersionPlus(
-      iOSId: 'com.DEBUGSOFT.godawariApp',
+      iOSId: 'com.DEBUGSOFT.godawari_app',
       androidId: 'com.DEBUGSOFT.godawari_app',
     );
     advancedStatusCheck(newVersion);
@@ -785,6 +785,5 @@ class _LoginState extends State<Login> {
     );
   }
 }
-
 
 

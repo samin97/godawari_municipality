@@ -3,6 +3,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:smart_attendance/main_screen/settings/settings.dart';
+import 'package:uuid/uuid.dart';
 import 'dart:io' show Platform;
 import '../../global/global.dart';
 import '../../models/device_id_response.dart';
@@ -21,7 +22,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
     fetchDeviceID();
   }
 
-  String deviceID = "device ID";
+  String userUUID = "device ID";
   late var deviceInfo;
 
   Future<void> fetchDeviceID() async {
@@ -33,13 +34,23 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       deviceInfo = await deviceInfoPlugin.iosInfo;
     }
     setState(() {
-      deviceID = deviceInfo.id.toString();
+      var uuid = Uuid();
+      print("uuid");
+      // Generate a v1 exact (time-based) id
+      var v1_exact = uuid.v1(options: {
+        'node': [0x81, 0x43, 0x65, 0x62, 0x89, 0xab],
+        'clockSeq': 0x1234,
+        'mSecs': DateTime.utc(2023, 06, 16).millisecondsSinceEpoch,
+        'nSecs': 5678
+      });
+      userUUID = v1_exact;
+      print(userUUID);
     });
   }
 
   Future checkDeviceID() async {
     var url=  "http://mis.godawarimun.gov.np/Api/Attendence/GetDeviceId?deviceId=";
-    url = url + deviceID;
+    url = url + userUUID;
     print(url);
     final token = sharedPreferences!.getString("token")!;
     var response = await http.get(
@@ -58,7 +69,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
           "firstName", deviceIdResponse.firstName);
       print(sharedPreferences!.getString("deviceId")!);
 
-      if (deviceID == sharedPreferences!.getString("deviceId")!) {
+      if (userUUID == sharedPreferences!.getString("deviceId")!) {
          conformDeviceID();
       } else {
         usedDeviceID();
@@ -89,7 +100,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
     final token = sharedPreferences!.getString("token")!;
     var url =
         'http://mis.godawarimun.gov.np/Api/Attendence/UpdateDeviceId?deviceId=';
-    url = url + deviceID;
+    url = url + userUUID;
     var response = await http.post(
       Uri.parse(url),
       headers: <String, String>{
@@ -103,6 +114,10 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       const snackBar = SnackBar(
         content: Text('Device ID has been changed.'),
       );
+
+      await sharedPreferences?.setString(
+          "userUUID", userUUID);
+
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
       Navigator.pushReplacement(context, newRoute);
@@ -185,16 +200,13 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
                 height: 40,
               ),
               Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("हाल संचालनमा रहोको मोबाइल सेटको विवरण निम्नानुसार छः ",
                       style: TextStyle(fontSize: 20)),
-                  Row(
-                    children: [
-                      Text("मोबाइल सेटको विवरण:",
-                          style: TextStyle(fontSize: 18)),
-                      Text(deviceID, style: TextStyle(fontSize: 18)),
-                    ],
-                  ),
+                  Text("मोबाइल सेटको विवरण:",
+                      style: TextStyle(fontSize: 18)),
+                  Text(userUUID, style: TextStyle(fontSize: 18)),
                   const SizedBox(
                     height: 10,
                   ),
@@ -203,18 +215,21 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
                   const SizedBox(
                     height: 20,
                   ),
-                  ElevatedButton(
-                      onPressed: () {
-                        const snackBar = SnackBar(
-                          content: Text('मोबाइल सेटको ID परिवर्तन भइरहेको छ ।'),
-                        );
+                  Align(
+                    alignment: Alignment.center,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          const snackBar = SnackBar(
+                            content: Text('मोबाइल सेटको ID परिवर्तन भइरहेको छ ।'),
+                          );
 
-                        // Find the ScaffoldMessenger in the widget tree
-                        // and use it to show a SnackBar.
-                        ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                        checkDeviceID();
-                      },
-                      child: const Text("पेश गर्नुहोस्")),
+                          // Find the ScaffoldMessenger in the widget tree
+                          // and use it to show a SnackBar.
+                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                          checkDeviceID();
+                        },
+                        child: const Text("पेश गर्नुहोस्")),
+                  ),
                 ],
               ),
             ],

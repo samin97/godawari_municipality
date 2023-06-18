@@ -105,13 +105,8 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
         desiredAccuracy: LocationAccuracy.high);
     position = newPosition;
     //deviceId:
-    final deviceInfoPlugin = DeviceInfoPlugin();
 
-    if (Platform.isAndroid) {
-      deviceInfo = await deviceInfoPlugin.androidInfo;
-    } else if (Platform.isIOS) {
-      deviceInfo = await deviceInfoPlugin.iosInfo;
-    }
+    deviceInfo = sharedPreferences!.getString("userUUID")!;
 
     //networkId:
     final info = NetworkInfo();
@@ -125,7 +120,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
       attendanceModel.attendDateTime = isoAttendDateTime.trim();
       attendanceModel.latitude = position?.latitude.toString();
       attendanceModel.longitude = position?.longitude.toString();
-      attendanceModel.deviceId = deviceInfo.id.toString();
+      attendanceModel.deviceId = deviceInfo;
       attendanceModel.networkId = wifiGateway;
       attendanceModel.altitude = position?.altitude.toString();
       attendanceModel.status = "check-in";

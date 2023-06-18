@@ -17,9 +17,35 @@ class CitizenChart extends StatefulWidget {
 
 class _CitizenChartState extends State<CitizenChart> {
 
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
+  var sakhaList = [''];
+  Future getSakhaList() async {
+    var url = "http://mis.godawarimun.gov.np/Api/WadaPatra/GetSakha";
 
-  Future<List<CitizenChartModel>> approvedLeave() async {
+    final response = await http.get(
+      Uri.parse(url),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+    if (response.statusCode == 200) {
+      var jsonData = json.decode(response.body);
+      print(jsonData);
+      setState(() {
+        sakhaList = jsonData;
+      });
+
+    } else {
+      throw Exception('Failed to load event log');
+    }
+  }
+
+  Future<List<CitizenChartModel>> getSakha() async {
     var url = "http://mis.godawarimun.gov.np/Api/WadaPatra/GetWadaPatra?sakha=";
 
     if (value == null) {
@@ -49,7 +75,24 @@ class _CitizenChartState extends State<CitizenChart> {
 
   String? value;
 
-  final sakhaList = ['test','DUMMY'];
+  Future<List<String>> getAllCategory() async {
+    var baseUrl = "http://mis.godawarimun.gov.np/Api/WadaPatra/GetSakha";
+
+    http.Response response = await http.get(Uri.parse(baseUrl));
+
+    if (response.statusCode == 200) {
+      List<String> items = [];
+      var jsonData = json.decode(response.body) as List;
+      for (var element in jsonData) {
+        items.add(element["sakhaName"]);
+      }
+      return items;
+    } else {
+      throw response.statusCode;
+    }
+  }
+
+
 
   DropdownMenuItem<String> buildMenuItems(String leaveFor) => DropdownMenuItem(
         value: leaveFor,
@@ -95,27 +138,55 @@ class _CitizenChartState extends State<CitizenChart> {
               borderRadius: BorderRadius.circular(5),
               border: Border.all(color: Colors.black),
             ),
-            child: DropdownButtonHideUnderline(
-              child: DropdownButton(
-                value: value,
-                hint: const Text(
-                  "शाखा/उप-शाखा छान्नुहोस्",
-                  style: TextStyle(fontSize: 20, color: Colors.black),
-                ),
-                dropdownColor: Colors.white,
-                isExpanded: true,
-                items: sakhaList.map(buildMenuItems).toList(),
-                onChanged: (value) => setState(
-                  () {
-                    this.value = value as String?;
-                    approvedLeave();
+
+            child: Column(
+              children: [
+                FutureBuilder<List<String>>(
+                  future: getAllCategory(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      var data = snapshot.data!;
+                      return DropdownButtonHideUnderline(
+                        child: DropdownButton(
+                          dropdownColor: Colors.white,
+                          isExpanded: true,
+                          hint: const Text(
+                            "शाखा/उप-शाखा छान्नुहोस्",
+                            style: TextStyle(fontSize: 20, color: Colors.black),
+                          ),
+                          // Initial Value
+                          value: value,
+
+                          // Down Arrow Icon
+                          icon: const Icon(Icons.keyboard_arrow_down),
+
+                          // Array list of items
+                          items: data.map((String items) {
+                            return DropdownMenuItem(
+                              value: items,
+                              child: Text(items),
+                            );
+                          }).toList(),
+                          // After selecting the desired option,it will
+                          // change button value to selected value
+                          onChanged: (value) {
+                            setState(() {
+                              this.value = value as String?;
+                              getSakha();
+                            });
+                          },
+                        ),
+                      );
+                    } else {
+                      return const CircularProgressIndicator();
+                    }
                   },
                 ),
-              ),
+              ],
             ),
           ),
           FutureBuilder<List<CitizenChartModel>>(
-            future: approvedLeave(),
+            future: getSakha(),
             builder: (context, AsyncSnapshot snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(
@@ -139,22 +210,25 @@ class _CitizenChartState extends State<CitizenChart> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text("सेवाको किसिम : " +
-                                        chartList[index].sewaKisim.toString()),
-                                    Text("जिम्मेवारी अधिकारी : " +
-                                        chartList[index]
-                                            .jimbebarAdhakari
-                                            .toString()),
-                                    Text("शुल्क/दस्तुर  : NRs." +
-                                        chartList[index].sewaSulkhaRs.toString()),
-                                    Text("लाग्ने समय : " +
-                                        chartList[index].lagneSamaya.toString()),
-                                  ],
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("सेवाको किसिम : " +
+                                          chartList[index].sewaKisim.toString()),
+                                      Text("जिम्मेवारी अधिकारी : " +
+                                          chartList[index]
+                                              .jimbebarAdhakari
+                                              .toString()),
+                                      Text("शुल्क/दस्तुर  : NRs." +
+                                          chartList[index].sewaSulkhaRs.toString()),
+                                      Text("लाग्ने समय : " +
+                                          chartList[index].lagneSamaya.toString()),
+                                    ],
+                                  ),
                                 ),
-                                Align(child: Text("View Details"),alignment: Alignment.bottomRight)
+                                SizedBox(width: 6,),
+                                Align(child: Text("थप विवरण"),alignment: Alignment.bottomRight)
                               ],
                             ),
                             onTap: () {

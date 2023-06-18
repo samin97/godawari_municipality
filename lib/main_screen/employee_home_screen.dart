@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:nepali_utils/nepali_utils.dart';
 import 'package:network_info_plus/network_info_plus.dart';
+import 'package:smart_attendance/main_screen/help.dart';
 import 'package:smart_attendance/main_screen/report/report_category.dart';
 import 'package:smart_attendance/main_screen/settings/settings.dart';
 import 'package:smart_attendance/main_screen/settings/update_device_id.dart';
@@ -705,7 +706,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                 text: 'मद्दत',
                                 onTap: () {
                                   Route newRoute = MaterialPageRoute(
-                                      builder: (_) => const AttendanceReport());
+                                      builder: (_) => const Help());
                                   Navigator.pushReplacement(context, newRoute);
                                 },
                                 icon: const Icon(Icons.developer_mode,

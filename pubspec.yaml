@@ -40,11 +40,13 @@ dependencies:
 
 
 
+
+
   #attendance info
   nepali_utils: ^3.0.3
   geolocator: ^9.0.2
   geocoding: ^2.0.4
-  device_info_plus: ^8.1.0
+  device_info_plus: ^9.0.2
   network_info_plus: ^3.0.2
   sms_autofill: ^2.2.0
 
@@ -69,6 +71,7 @@ dependencies:
 
   #report:
   month_year_picker: ^0.2.0+1
+  uuid: ^3.0.7
 
 dev_dependencies:
   flutter_test:

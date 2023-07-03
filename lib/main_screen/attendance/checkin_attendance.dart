@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
@@ -77,15 +76,6 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
       throw Exception('Failed to load attendance');
     }
   }
-  Future printIps() async {
-    for (var interface in await NetworkInterface.list()) {
-      print('== Interface: ${interface.name} ==');
-      for (var addr in interface.addresses) {
-        print(
-            '${addr.address} ${addr.host} ${addr.isLoopback} ${addr.rawAddress} ${addr.type.name}');
-      }
-    }
-  }
 
 
   Future<void> attendanceDetails() async {
@@ -111,8 +101,7 @@ class _AttendanceCheckInState extends State<AttendanceCheckIn> {
     //networkId:
     final info = NetworkInfo();
     var wifiGateway = await info.getWifiGatewayIP();
-    print(wifiGateway);
-    printIps();
+
 
     setState(() {
       attendanceModel.nepaliDate = nepaliFormatted.trim();

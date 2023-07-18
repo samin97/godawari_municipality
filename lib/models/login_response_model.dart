@@ -12,6 +12,7 @@ class LoginResponseModel {
     required this.username,
     this.firstName,
     this.role,
+    this.id,
     this.nepaliName,
     required this.latitude,
     required this.longitude,
@@ -22,6 +23,7 @@ class LoginResponseModel {
 
   String? tokenString;
   String? username;
+  int? id;
   String? firstName;
   String? role;
   dynamic nepaliName;
@@ -37,6 +39,7 @@ class LoginResponseModel {
         username: json["username"],
         firstName: json["firstName"],
         role: json["role"],
+        id: json["id"],
         permission: json["permission"],
         nepaliName: json["nepaliName"],
         latitude: json["latitude"],
@@ -50,6 +53,7 @@ class LoginResponseModel {
         "username": username,
         "firstName": firstName,
         "role": role,
+        "id": id,
         "permission": permission,
         "nepaliName": nepaliName,
         "latitude": latitude,

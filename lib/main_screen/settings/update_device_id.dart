@@ -23,6 +23,8 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
   }
 
   String userUUID = "device ID";
+
+  String generatedUID = "device ID";
   late var deviceInfo;
 
   Future<void> fetchDeviceID() async {
@@ -34,9 +36,10 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       deviceInfo = await deviceInfoPlugin.iosInfo;
     }
     setState(() {
+      generatedUID = deviceInfo.id.toString()+sharedPreferences!.getString("id")!;
+    });
+    setState(() {
       var uuid = Uuid();
-      print("uuid");
-      // Generate a v1 exact (time-based) id
       var v1_exact = uuid.v1(options: {
         'node': [0x81, 0x43, 0x65, 0x62, 0x89, 0xab],
         'clockSeq': 0x1234,
@@ -44,13 +47,12 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
         'nSecs': 5678
       });
       userUUID = v1_exact;
-      print(userUUID);
     });
   }
 
   Future checkDeviceID() async {
     var url=  "http://mis.godawarimun.gov.np/Api/Attendence/GetDeviceId?deviceId=";
-    url = url + userUUID;
+    url = url + generatedUID;
     print(url);
     final token = sharedPreferences!.getString("token")!;
     var response = await http.get(
@@ -61,20 +63,23 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       },
     );
     if (response.statusCode == 200) {
-      DeviceIdResponse deviceIdResponse =
-          DeviceIdResponse.fromJson(jsonDecode(response.body));
-      await sharedPreferences?.setString("deviceId", deviceIdResponse.deviceId);
-      await sharedPreferences?.setString("username", deviceIdResponse.username);
-      await sharedPreferences?.setString(
-          "firstName", deviceIdResponse.firstName);
-      print(sharedPreferences!.getString("deviceId")!);
-
-      if (userUUID == sharedPreferences!.getString("deviceId")!) {
-         conformDeviceID();
-      } else {
-        usedDeviceID();
-      }
-    } else {}
+      updateDeviceID();
+      // DeviceIdResponse deviceIdResponse =
+      //     DeviceIdResponse.fromJson(jsonDecode(response.body));
+      // await sharedPreferences?.setString("deviceId", deviceIdResponse.deviceId ?? "deviceID");
+      // await sharedPreferences?.setString("username", deviceIdResponse.username?? "username");
+      // await sharedPreferences?.setString(
+      //     "firstName", deviceIdResponse.firstName ?? "firstname");
+      // print(sharedPreferences!.getString("deviceId")!);
+      //
+      // if (generatedUID == sharedPreferences!.getString("deviceId")!) {
+      //
+      // } else {
+      //   usedDeviceID();
+      // }
+    } else {
+      deviceIDChangeFailed();
+    }
   }
 
   showLoaderDialog(BuildContext context) {
@@ -96,11 +101,11 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
     );
   }
 
-  Future conformDeviceID() async {
+  Future updateDeviceID() async {
     final token = sharedPreferences!.getString("token")!;
     var url =
         'http://mis.godawarimun.gov.np/Api/Attendence/UpdateDeviceId?deviceId=';
-    url = url + userUUID;
+    url = url + generatedUID;
     var response = await http.post(
       Uri.parse(url),
       headers: <String, String>{
@@ -114,10 +119,8 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       const snackBar = SnackBar(
         content: Text('Device ID has been changed.'),
       );
-
       await sharedPreferences?.setString(
-          "userUUID", userUUID);
-
+          "userUUID", generatedUID);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
       Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
       Navigator.pushReplacement(context, newRoute);
@@ -153,10 +156,10 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
     showDialog<String>(
       context: context,
       builder: (BuildContext context) => AlertDialog(
-        title: const Text("मोबाइल सेटको ID परिवर्तन हुन सकेन ।"),
+        title: const Text("मोबाइल सेटको ID परिवर्तन हुन सकेन।"),
         //Failed to change device ID
         content: const Text(
-            "मोबाइल सेटको ID परिवर्तन गर्न असमर्थ । फेरि प्रायस गर्नुहोसा ।"),
+            "मोबाइल सेटको ID परिवर्तन गर्न असमर्थ। फेरि प्रायस गर्नुहोसा।"),
         //Unable to change the Device ID. Please try again.
         actions: [
           TextButton(
@@ -206,7 +209,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
                       style: TextStyle(fontSize: 20)),
                   Text("मोबाइल सेटको विवरण:",
                       style: TextStyle(fontSize: 18)),
-                  Text(userUUID, style: TextStyle(fontSize: 18)),
+                  Text(generatedUID, style: TextStyle(fontSize: 18)),
                   const SizedBox(
                     height: 10,
                   ),
@@ -219,13 +222,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
                     alignment: Alignment.center,
                     child: ElevatedButton(
                         onPressed: () {
-                          const snackBar = SnackBar(
-                            content: Text('मोबाइल सेटको ID परिवर्तन भइरहेको छ ।'),
-                          );
 
-                          // Find the ScaffoldMessenger in the widget tree
-                          // and use it to show a SnackBar.
-                          ScaffoldMessenger.of(context).showSnackBar(snackBar);
                           checkDeviceID();
                         },
                         child: const Text("पेश गर्नुहोस्")),

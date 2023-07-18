@@ -6,14 +6,14 @@ String deviceIdResponseToJson(DeviceIdResponse data) => json.encode(data.toJson(
 
 class DeviceIdResponse {
   DeviceIdResponse({
-    required this.firstName,
-    required this.username,
-    required this.deviceId,
+     this.firstName,
+     this.username,
+     this.deviceId,
   });
 
-  String firstName;
-  String username;
-  String deviceId;
+  String? firstName;
+  String? username;
+  String? deviceId;
 
   factory DeviceIdResponse.fromJson(Map<String, dynamic> json) => DeviceIdResponse(
     firstName: json["firstName"],

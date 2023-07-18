@@ -242,6 +242,8 @@ class _LoginState extends State<Login> {
       await sharedPreferences?.setString(
           "latitude", userDetails.latitude ?? "latitude");
       await sharedPreferences?.setString(
+          "id", userDetails.id.toString() ?? "id");
+      await sharedPreferences?.setString(
           "longitude", userDetails.longitude ?? "longitude");
       await sharedPreferences?.setString(
           "deviceId", userDetails.deviceId ?? 'deviceID');

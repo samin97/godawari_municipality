@@ -9,8 +9,6 @@ import 'package:network_info_plus/network_info_plus.dart';
 import 'package:http/http.dart' as http;
 import '../../global/global.dart';
 import '../../global/widgets/error_dialog.dart';
-import '../../local_db/db/sqlite_db.dart';
-import '../../local_db/repository/log_repository.dart';
 import '../../models/attendance_model.dart';
 import '../../models/local_storage_model.dart';
 import '../../models/work_check_time.dart';
@@ -273,29 +271,6 @@ class _AttendanceCheckOutState extends State<AttendanceCheckOut> {
     }
   }
 
-  Future localStorage() async {
-    if (sharedPreferences!.getString("logID") == null) {
-      await sharedPreferences?.setString("logID", '1000');
-    }
-    var logID = sharedPreferences!.getString("logID");
-    Log log = Log(
-        id: logID,
-        attendDateTime: attendanceModel.attendDateTime,
-        nepaliDate: attendanceModel.nepaliDate,
-        longitude: attendanceModel.longitude,
-        latitude: attendanceModel.latitude,
-        deviceId: attendanceModel.deviceId,
-        englishDate: attendanceModel.englishDate,
-        networkId: attendanceModel.networkId,
-        altitude: attendanceModel.altitude,
-        status: "check-out");
-
-    logID = (int.parse(logID!) + 1).toString();
-    await sharedPreferences?.setString("logID", logID);
-    setState(() {});
-    SqliteMethods().init();
-    LogRepository.addLogs(log);
-  }
 
   Future postAttendance() async {
     final token = sharedPreferences!.getString("token")!;

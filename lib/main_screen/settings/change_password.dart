@@ -125,7 +125,7 @@ class _ChangePasswordState extends State<ChangePassword> {
         content: Text('Password has been changed.'),
       );
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
+      Route newRoute = MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
       Navigator.pushReplacement(context, newRoute);
     } else {
       passwordChangeFailed();

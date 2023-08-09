@@ -256,7 +256,7 @@ class _LoginState extends State<Login> {
       print(sharedPreferences!.getString("password")!);
       print(sharedPreferences!.getString("username")!);
       print(userDetails);
-      Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
+      Route newRoute = MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
       Navigator.pushReplacement(context, newRoute);
     } else {
       failedSignIn();

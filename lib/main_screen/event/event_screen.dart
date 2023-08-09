@@ -60,7 +60,7 @@ class _EventListScreenState extends State<EventListScreen> {
             icon: const Icon(Icons.arrow_back, color: Colors.white),
             onPressed: () {
               Route newRoute =
-                  MaterialPageRoute(builder: (_) => const HomeScreen());
+                  MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
               Navigator.pushReplacement(context, newRoute);
             },
           ),

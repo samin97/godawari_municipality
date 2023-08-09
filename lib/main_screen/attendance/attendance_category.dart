@@ -26,8 +26,6 @@ class _AttendanceCategoryState extends State<AttendanceCategory> {
           length: 2,
           child: Scaffold(
             appBar: AppBar(
-
-
               automaticallyImplyLeading: false,
               title: const Text(
                 'Attendance',
@@ -41,7 +39,7 @@ class _AttendanceCategoryState extends State<AttendanceCategory> {
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   Route newRoute =
-                  MaterialPageRoute(builder: (_) => const HomeScreen());
+                  MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
                   Navigator.pushReplacement(context, newRoute);
                 },
               ),

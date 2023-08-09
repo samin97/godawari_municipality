@@ -30,7 +30,7 @@ class ButtonHeaderWidget extends StatelessWidget {
           child: Text(
             text,
             style: const TextStyle(
-              fontSize: 20,
+              fontSize: 16,
               color: Colors.black,
               fontWeight: FontWeight.w400,
             ),

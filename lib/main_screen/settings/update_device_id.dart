@@ -122,7 +122,7 @@ class _UpdateDeviceIDState extends State<UpdateDeviceID> {
       await sharedPreferences?.setString(
           "userUUID", generatedUID);
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
-      Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
+      Route newRoute = MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
       Navigator.pushReplacement(context, newRoute);
     } else if (response.statusCode == 191) {
       usedDeviceID();

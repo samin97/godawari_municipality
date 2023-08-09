@@ -151,7 +151,7 @@ class _RequestKaajState extends State<RequestKaaj> {
       // var s = response.body.toString();
       ScaffoldMessenger.of(this.context)
           .showSnackBar(const SnackBar(content: Text("Successfully Posted")));
-      Route newRoute = MaterialPageRoute(builder: (_) => const HomeScreen());
+      Route newRoute = MaterialPageRoute(builder: (_) => const EmployeeHomeScreen());
       Navigator.pushReplacement(this.context, newRoute);
     } else {
       showDialog(

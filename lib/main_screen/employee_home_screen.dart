@@ -13,6 +13,7 @@ import 'package:smart_attendance/main_screen/report/report_category.dart';
 import 'package:smart_attendance/main_screen/settings/settings.dart';
 import 'package:smart_attendance/main_screen/settings/update_device_id.dart';
 import 'package:smart_attendance/main_screen/test_dummy.dart';
+import 'package:smart_attendance/main_screen/yojana_anugaman/online_yojana/yojana_main.dart';
 import 'public_home/employee_login.dart';
 import '../global/widgets/app_button.dart';
 import '../global/widgets/error_dialog.dart';
@@ -27,14 +28,14 @@ import 'kaaj/user/kaaj.dart';
 import 'leave/admin/leave_status_screen.dart';
 import 'leave/user/leave_category.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+class EmployeeHomeScreen extends StatefulWidget {
+  const EmployeeHomeScreen({Key? key}) : super(key: key);
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<EmployeeHomeScreen> createState() => _EmployeeHomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _EmployeeHomeScreenState extends State<EmployeeHomeScreen> {
   Position? position;
   bool hasEnabledLocation = false;
   late AttendanceModel attendanceModel = AttendanceModel(
@@ -622,6 +623,53 @@ class _HomeScreenState extends State<HomeScreen> {
                         ],
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const Spacer(flex: 2),
+                          Flexible(
+                            flex: 3,
+                            child: AppButton(
+                              textColour: Colors.black54,
+                              backgroundColor: const Color(0xFFDADADA),
+                              borderColor: const Color(0xFFC4C4C4),
+                              text: 'Yojana/Anugaman',
+                              onTap: () {
+                                Route newRoute = MaterialPageRoute(
+                                    builder: (_) => const YojanaMain());
+                                Navigator.pushReplacement(context, newRoute);
+                              },
+                              icon: const Icon(
+                                Icons.document_scanner_rounded,
+                                size: 30,
+                                color: Color(0xFF10599e),
+                              ),
+                            ),
+                          ),
+                          const Spacer(flex: 1),
+                          Flexible(
+                            flex: 3,
+                            child: AppButton(
+                              textColour: Colors.black54,
+                              backgroundColor: const Color(0xFFDADADA),
+                              borderColor: const Color(0xFFC4C4C4),
+                              text: 'मद्दत',
+                              onTap: () {
+                                Route newRoute = MaterialPageRoute(
+                                    builder: (_) => const Help());
+                                Navigator.pushReplacement(context, newRoute);
+                              },
+                              icon: const Icon(Icons.developer_mode,
+                                  size: 30, color: Color(0xFF10599e)),
+                            ),
+                          ),
+
+                          const Spacer(flex: 2),
+                        ],
+                      ),
+                    ),
                     Visibility(
                       visible: ((sharedPreferences!.getString("role")!)
                                   .toLowerCase() ==
@@ -632,7 +680,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             const Spacer(flex: 2),
                             Flexible(
@@ -654,43 +702,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               ),
                             ),
-                            const Spacer(flex: 1),
-                            // Flexible(
-                            //   flex: 3,
-                            //   child: AppButton(
-                            //     textColour: Colors.black54,
-                            //     backgroundColor: const Color(0xFFDADADA),
-                            //     borderColor: const Color(0xFFC4C4C4),
-                            //     text: 'काज (एडमिन)',
-                            //     onTap: () {
-                            //       // Route newRoute = MaterialPageRoute(
-                            //       //     builder: (_) => const LeaveStatus());
-                            //       // Navigator.pushReplacement(context, newRoute);
-                            //     },
-                            //     icon: const Icon(
-                            //       Icons.account_balance_outlined,
-                            //       size: 30,
-                            //       color: Color(0xFF10599e),
-                            //     ),
-                            //   ),
-                            // ),
-                            Flexible(
-                              flex: 3,
-                              child: AppButton(
-                                textColour: Colors.black54,
-                                backgroundColor: const Color(0xFFDADADA),
-                                borderColor: const Color(0xFFC4C4C4),
-                                text: 'मद्दत',
-                                onTap: () {
-                                  Route newRoute = MaterialPageRoute(
-                                      builder: (_) => const Help());
-                                  Navigator.pushReplacement(context, newRoute);
-                                },
-                                icon: const Icon(Icons.developer_mode,
-                                    size: 30, color: Color(0xFF10599e)),
-                              ),
-                            ),
-
                             const Spacer(flex: 2),
                           ],
                         ),

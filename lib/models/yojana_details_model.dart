@@ -16,7 +16,7 @@ class YojanaModel {
   String? sourceOfFund;
   String? budgetBiniyojanType;
   String? planningProgram;
-  String? yearly;
+  String? yearlyBudget;
 
   YojanaModel({
     required this.id,
@@ -28,7 +28,7 @@ class YojanaModel {
     this.sourceOfFund,
     this.budgetBiniyojanType,
     this.planningProgram,
-    this.yearly,
+    this.yearlyBudget,
   });
 
   factory YojanaModel.fromJson(Map<String, dynamic> json) => YojanaModel(
@@ -41,7 +41,7 @@ class YojanaModel {
         sourceOfFund: json["sourceOfFund"],
         budgetBiniyojanType: json["budgetBiniyojanType"],
         planningProgram: json["planningProgram"],
-        yearly: json["yearly"],
+        yearlyBudget: json["yearly"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -54,6 +54,6 @@ class YojanaModel {
         "sourceOfFund": sourceOfFund,
         "budgetBiniyojanType": budgetBiniyojanType,
         "planningProgram": planningProgram,
-        "yearly": yearly,
+        "yearly": yearlyBudget,
       };
 }

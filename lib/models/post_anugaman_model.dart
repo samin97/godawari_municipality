@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final postAnugamanModel = postAnugamanModelFromJson(jsonString);
-
 import 'dart:convert';
 
 PostAnugamanModel postAnugamanModelFromJson(String str) =>
@@ -11,93 +7,120 @@ String postAnugamanModelToJson(PostAnugamanModel data) =>
     json.encode(data.toJson());
 
 class PostAnugamanModel {
-
-  int budgetId;
+  int? budgetId;
   String? monitoringDateNep;
+  List<String>? whatYouSawList;
   String? whatYouSaw;
   String? yourFeedBack;
-  String? responseOfPreviousFeedback;
   String? progressStatus;
   String? complitionPercentage;
+  String? responseOfPreviousFeedback;
+  String? reprisintivePhone;
+  String? image1;
+  String? image2;
+  String? image3;
   String? quality;
   String? remarksOnQuality;
   String? additionalNote;
   String? consultantReprisintive;
-  String? reprisintivePhone;
   String? overAllRemarks;
   String? latitude;
   String? longitude;
-  int? anugamanTypeId;
-  String? image1;
-  String? image2;
-  String? image3;
+  bool? isGroup;
+  List<UserAssigned> userAssigneds;
 
   PostAnugamanModel({
-
-    required this.budgetId,
+    this.budgetId,
     this.monitoringDateNep,
+    this.whatYouSawList,
     this.whatYouSaw,
     this.yourFeedBack,
     this.responseOfPreviousFeedback,
     this.progressStatus,
     this.complitionPercentage,
+    this.reprisintivePhone,
+    this.image1,
+    this.image2,
+    this.image3,
     this.quality,
     this.remarksOnQuality,
     this.additionalNote,
     this.consultantReprisintive,
-    this.reprisintivePhone,
     this.overAllRemarks,
     this.latitude,
     this.longitude,
-    this.anugamanTypeId,
-    this.image1,
-    this.image2,
-    this.image3,
+    this.isGroup,
+    required this.userAssigneds,
   });
 
   factory PostAnugamanModel.fromJson(Map<String, dynamic> json) =>
       PostAnugamanModel(
-        budgetId: json["BudgetId"],
-        monitoringDateNep: json["MonitoringDateNep"],
-        whatYouSaw: json["WhatYouSaw"],
-        yourFeedBack: json["YourFeedBack"],
-        responseOfPreviousFeedback: json["ResponseOfPreviousFeedback"],
-        progressStatus: json["ProgressStatus"],
-        complitionPercentage: json["ComplitionPercentage"],
-        quality: json["Quality"],
-        remarksOnQuality: json["RemarksOnQuality"],
-        additionalNote: json["AdditionalNote"],
-        consultantReprisintive: json["ConsultantReprisintive"],
-        reprisintivePhone: json["ReprisintivePhone"],
-        overAllRemarks: json["OverAllRemarks"],
-        latitude: json["Latitude"],
-        longitude: json["Longitude"],
-        anugamanTypeId: json["AnugamanTypeId"],
-        image1: json["Image1"],
-        image2: json["Image2"],
-        image3: json["Image3"],
+        budgetId: json["budgetId"],
+        monitoringDateNep: json["monitoringDateNep"],
+        whatYouSawList: List<String>.from(json["whatYouSawList"].map((x) => x)),
+        whatYouSaw: json["whatYouSaw"],
+        yourFeedBack: json["yourFeedBack"],
+        responseOfPreviousFeedback: json["responseOfPreviousFeedback"],
+        progressStatus: json["progressStatus"],
+        complitionPercentage: json["complitionPercentage"],
+        image1: json["image1"],
+        image2: json["image2"],
+        image3: json["image3"],
+        quality: json["quality"],
+        remarksOnQuality: json["remarksOnQuality"],
+        additionalNote: json["additionalNote"],
+        consultantReprisintive: json["consultantReprisintive"],
+        reprisintivePhone: json["reprisintivePhone"],
+        overAllRemarks: json["overAllRemarks"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+        isGroup: json["isGroup"],
+        userAssigneds: List<UserAssigned>.from(
+            json["userAssigneds"].map((x) => UserAssigned.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
+    "budgetId": budgetId,
+    "monitoringDateNep": monitoringDateNep,
+    "whatYouSawList": List<dynamic>.from(whatYouSawList!.map((x) => x)),
+    "whatYouSaw": whatYouSaw,
+    "yourFeedBack": yourFeedBack,
+    "responseOfPreviousFeedback": responseOfPreviousFeedback,
+    "progressStatus": progressStatus,
+    "complitionPercentage": complitionPercentage,
+    "image1": image1,
+    "image2": image2,
+    "image3": image3,
+    "quality": quality,
+    "remarksOnQuality": remarksOnQuality,
+    "additionalNote": additionalNote,
+    "consultantReprisintive": consultantReprisintive,
+    "reprisintivePhone": reprisintivePhone,
+    "overAllRemarks": overAllRemarks,
+    "latitude": latitude,
+    "longitude": longitude,
+    "isGroup": isGroup,
+    "userAssigneds":
+    List<dynamic>.from(userAssigneds.map((x) => x.toJson())),
+  };
+}
 
-        "BudgetId": budgetId,
-        "MonitoringDateNep": monitoringDateNep,
-        "WhatYouSaw": whatYouSaw,
-        "YourFeedBack": yourFeedBack,
-        "ResponseOfPreviousFeedback": responseOfPreviousFeedback,
-        "ProgressStatus": progressStatus,
-        "ComplitionPercentage": complitionPercentage,
-        "Quality": quality,
-        "RemarksOnQuality": remarksOnQuality,
-        "AdditionalNote": additionalNote,
-        "ConsultantReprisintive": consultantReprisintive,
-        "ReprisintivePhone": reprisintivePhone,
-        "OverAllRemarks": overAllRemarks,
-        "Latitude": latitude,
-        "Longitude": longitude,
-        "AnugamanTypeId": anugamanTypeId,
-        "Image1": image1,
-        "Image2": image2,
-        "Image3": image3,
-      };
+class UserAssigned {
+  String? id;
+  bool? isAssigned;
+
+  UserAssigned({
+    this.id,
+    this.isAssigned,
+  });
+
+  factory UserAssigned.fromJson(Map<String, dynamic> json) => UserAssigned(
+    id: json["id"],
+    isAssigned: json["isAssigned"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id": id,
+    "isAssigned": isAssigned,
+  };
 }
